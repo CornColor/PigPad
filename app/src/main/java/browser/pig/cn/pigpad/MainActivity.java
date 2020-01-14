@@ -24,10 +24,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //当sdk版本大于等于16更换播放引擎
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            Jzvd.setMediaInterface(new JZExoPlayer());
-        }
+
     }
 
     @Override
@@ -53,7 +50,7 @@ public class MainActivity extends BaseActivity {
     public void initPresenter() {
 
         video.setUp("https://media.w3.org/2010/05/sintel/trailer.mp4","",JzvdStd.SCREEN_WINDOW_NORMAL);
-      //  video.startVideo();
+        video.startVideo();
         video.thumbImageView.setImageResource(R.drawable.applog);
 
     }
