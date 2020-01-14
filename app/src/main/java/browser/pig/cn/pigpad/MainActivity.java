@@ -55,7 +55,7 @@ public class MainActivity extends BaseActivity {
         video.setUp("https://media.w3.org/2010/05/sintel/trailer.mp4","",JzvdStd.SCREEN_WINDOW_NORMAL);
       //  video.startVideo();
         video.thumbImageView.setImageResource(R.drawable.applog);
-        
+
     }
 
     @Override
