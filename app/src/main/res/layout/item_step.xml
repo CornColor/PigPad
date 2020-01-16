@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="320dp"
+    android:layout_width="220dp"
     android:layout_height="match_parent"
     android:layout_marginLeft="8dp"
     android:layout_marginRight="6dp"
@@ -18,13 +18,13 @@
            android:layout_height="wrap_content"
            android:text="步骤一、扫描下方二维码，领取新用户红包，并下载APP（按照图示截图保留）；"
            android:textColor="#de000000"
-           android:textSize="14sp"
+           android:textSize="12sp"
            />
 
        <ImageView
            android:id="@+id/iv_code"
-           android:layout_width="120dp"
-           android:layout_height="120dp"
+           android:layout_width="80dp"
+           android:layout_height="80dp"
            android:background="@color/red_txt"
            android:layout_marginTop="8dp"
            android:layout_below="@id/tv_b_content"
@@ -42,7 +42,7 @@
                android:layout_height="wrap_content"
                android:text="语音指导："
                android:textColor="#8a000000"
-               android:textSize="16sp"
+               android:textSize="14sp"
                />
            <browser.pig.cn.pigpad.AudioPlayView
                android:id="@+id/play"

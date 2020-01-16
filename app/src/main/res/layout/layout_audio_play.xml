@@ -4,15 +4,15 @@
     android:layout_height="wrap_content">
 <RelativeLayout
     android:id="@+id/rl_audio_bg"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="180dp"
+    android:layout_height="43dp"
    android:background="@drawable/bg_qipao_touying"
     >
    <ImageView
        android:id="@+id/iv_play_laba"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:src="@drawable/icon_yuyin"
+       android:layout_width="40dp"
+       android:layout_height="42dp"
+       android:background="@drawable/icon_yuyin"
        android:layout_centerVertical="true"
        android:layout_marginLeft="16dp"
        />
@@ -21,11 +21,11 @@
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:text="60''"
-       android:textSize="24sp"
+       android:textSize="18sp"
        android:layout_centerVertical="true"
        android:textColor="@color/white"
        android:layout_toRightOf="@id/iv_play_laba"
-       android:layout_marginLeft="10dp"
+       android:layout_marginLeft="8dp"
 
        />
 

@@ -20,7 +20,7 @@
         <RelativeLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="104dp"
+            android:layout_height="84dp"
             android:background="@drawable/shape_01">
 
             <LinearLayout
@@ -40,7 +40,7 @@
                     android:layout_gravity="center_vertical"
                     android:text="产品列表"
                     android:textColor="#ffffe9e2"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
 
             </LinearLayout>
@@ -57,13 +57,16 @@
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
+        app:layout_constraintGuide_percent="0.22" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="0dp"
-        android:layout_height="104dp"
+        android:layout_height="84dp"
         android:background="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
@@ -87,7 +90,7 @@
                 android:paddingTop="14dp"
                 android:text="播放介绍视频"
                 android:textColor="#ffffffff"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tv_download"
@@ -101,7 +104,7 @@
                 android:paddingTop="14dp"
                 android:text="查看下载步骤"
                 android:textColor="#61000000"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
 
         </LinearLayout>
@@ -120,7 +123,7 @@
                 android:text="别想一下造出大海"
                 android:textColor="#61000000"
 
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -128,7 +131,7 @@
                 android:layout_marginTop="4dp"
                 android:text="必须先由小河川开始"
                 android:textColor="#61000000"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
     </RelativeLayout>
@@ -148,9 +151,9 @@
                 android:id="@+id/video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="24dp"
                 android:layout_above="@+id/t_video_name"
                 />
             <TextView
@@ -163,7 +166,7 @@
                 android:layout_marginBottom="16dp"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentBottom="true"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 />
         </RelativeLayout>
         <RelativeLayout
@@ -176,18 +179,18 @@
                 android:id="@+id/rv_bz"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginRight="24dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="100dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="60dp"
                 />
 
       <browser.pig.cn.pigpad.CircleIndicator4
           android:id="@+id/ci"
           android:layout_width="match_parent"
-          app:ci_width="20dp"
-          app:ci_height="20dp"
-          android:layout_height="100dp"
+          app:ci_width="10dp"
+          app:ci_height="10dp"
+          android:layout_height="60dp"
           android:layout_alignParentBottom="true"
           app:ci_drawable="@drawable/icon_chengseyuan"
           app:ci_drawable_unselected="@drawable/icon_huiseyuan"
