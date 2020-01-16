@@ -1,1 +1,1 @@
-include ':app',':mylibrary',':dialoglibrary'
+include ':app',':mylibrary',':dialoglibrary',':circleindicator'

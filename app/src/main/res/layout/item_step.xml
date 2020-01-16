@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="6dp"
+    android:background="#F8F8F8"
+    >
+   <RelativeLayout
+       android:id="@+id/rv_01"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+       <TextView
+           android:id="@+id/tv_b_content"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="步骤一、扫描下方二维码，领取新用户红包，并下载APP（按照图示截图保留）；"
+           android:textColor="#de000000"
+           android:textSize="14sp"
+           />
+
+       <ImageView
+           android:id="@+id/iv_code"
+           android:layout_width="120dp"
+           android:layout_height="120dp"
+           android:background="@color/red_txt"
+           android:layout_marginTop="8dp"
+           android:layout_below="@id/tv_b_content"
+
+           />
+
+       <LinearLayout
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           android:layout_alignParentBottom="true"
+           >
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="语音指导："
+               android:textColor="#8a000000"
+               android:textSize="16sp"
+               />
+           <browser.pig.cn.pigpad.AudioPlayView
+               android:id="@+id/play"
+               android:layout_width="wrap_content"
+               android:layout_marginTop="10dp"
+               android:layout_height="wrap_content"/>
+
+
+       </LinearLayout>
+   </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/rv_02"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:id="@+id/iv_bz"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:background="@color/blue_btn_bg_color"
+            />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
