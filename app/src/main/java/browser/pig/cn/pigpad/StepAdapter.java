@@ -6,6 +6,7 @@ import android.widget.RelativeLayout;
 
 import java.util.List;
 
+import browser.pig.cn.pigpad.bean.StepBean;
 import cn.my.library.ui.adapter.recycleview.CommonAdapter;
 import cn.my.library.ui.adapter.recycleview.base.ViewHolder;
 

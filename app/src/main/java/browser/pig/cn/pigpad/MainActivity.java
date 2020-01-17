@@ -3,6 +3,8 @@ package browser.pig.cn.pigpad;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import browser.pig.cn.pigpad.bean.GoodsListBean;
+import browser.pig.cn.pigpad.bean.StepBean;
 import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,8 +28,10 @@ import butterknife.OnClick;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
 import cn.my.library.utils.util.SPUtils;
+import me.relex.circleindicator.CircleIndicator;
 
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_LIST;
+import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_STEP;
 
 public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsClickListener {
     @Bind(R.id.tv_video)
@@ -40,43 +45,44 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     @Bind(R.id.r_v_01)
     RelativeLayout rV01;
 
-    RecyclerView rvBz;
+ //   RecyclerView rvBz;
     private RecyclerView rv_data;
     private GoodsAdapter adapter;
     private List<GoodsListBean.GoodsBean> list;
 
-    private List<StepBean> list1;
-    private StepAdapter stepAdapter;
+ //   private List<StepBean> list1;
+//    private StepAdapter stepAdapter;
 
-
+    StepPageAdapter stepPageAdapter;
     JzvdStd video;
 
     private GoodsListBean.GoodsBean mCurrGoods;
-
+    private ViewPager vp;
+    private  CircleIndicator indicator;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        list1 = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            StepBean goodsBean = new StepBean();
-            list1.add(goodsBean);
-        }
-        rvBz = findViewById(R.id.rv_bz);
-        stepAdapter = new StepAdapter(this,list1);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        rvBz.setLayoutManager(layoutManager);
-        rvBz.setAdapter(stepAdapter);
+//        list1 = new ArrayList<>();
+//        for (int i = 0; i < 4; i++) {
+//            StepBean goodsBean = new StepBean();
+//            list1.add(goodsBean);
+//        }
+     //   rvBz = findViewById(R.id.rv_bz);
+//        stepAdapter = new StepAdapter(this,list1);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+//        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//        rvBz.setLayoutManager(layoutManager);
+//        rvBz.setAdapter(stepAdapter);
 
 
 
-        CircleIndicator4 indicator = findViewById(R.id.ci);
-        indicator.attachToRecyclerView(rvBz);
+
+
 
 // optional
-        adapter.registerAdapterDataObserver(indicator.getAdapterDataObserver());
+       // adapter.registerAdapterDataObserver(indicator.getAdapterDataObserver());
     }
 
     @Override
@@ -99,6 +105,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     public void initView() {
         rv_data = findViewById(R.id.rv_data);
         video = findViewById(R.id.video);
+        indicator = findViewById(R.id.ci);
+        vp = findViewById(R.id.vp);
+        indicator.setViewPager(vp);
     }
 
     @Override
@@ -176,10 +185,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 list.addAll(goodsListBean.getData().getList());
                                 tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
                                 video.setUp(mCurrGoods.getProduct_video(), "", JzvdStd.SCREEN_WINDOW_NORMAL);
+                                loadStep(mCurrGoods.getProduct_id());
 
                             }
 
                             adapter.notifyDataSetChanged();
+
 
                         }
 
@@ -192,5 +203,45 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         mCurrGoods = goodsBean;
         tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
         video.changeUrl(mCurrGoods.getProduct_video(),"",1000);
+        video.onStatePause();
+        loadStep(mCurrGoods.getProduct_id());
+
+    }
+
+    /**
+     * 加载步骤
+     * @param id
+     */
+    private void loadStep(String id){
+        OkGo.<StepBean>post(GOODS_STEP)
+                .params("product_id",id)
+                .execute(new CommonCallback<StepBean>(StepBean.class) {
+
+                    @Override
+                    public void onFailure(String code, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(StepBean goodsListBean) {
+                        if(goodsListBean!= null){
+                            List<Fragment> fragments = new ArrayList<>();
+                          for (int i = 0;i < goodsListBean.getData().getList().size();i++){
+                              StepFragment stepFragment = new StepFragment();
+                              Bundle bundle = new Bundle();
+                              bundle.putString("audio",goodsListBean.getData().getList().get(i).getStep_voice());
+                              bundle.putString("bg",goodsListBean.getData().getList().get(i).getStep_img());
+                              stepFragment.setArguments(bundle);
+                              fragments.add(stepFragment);
+                          }
+                          stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),fragments);
+                          vp.setAdapter(stepPageAdapter);
+                          vp.setCurrentItem(0);
+
+
+                        }
+
+                    }
+                });
     }
 }

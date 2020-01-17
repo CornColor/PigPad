@@ -13,5 +13,10 @@ public interface ApiSearvice {
      */
     String GOODS_LIST = HOST+"product";
 
+    /**
+     * 步骤
+     */
+    String GOODS_STEP = HOST+"step";
+
 
 }
