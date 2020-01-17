@@ -1,5 +1,6 @@
 package browser.pig.cn.pigpad;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,16 +10,25 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.model.Response;
+import com.lzy.okgo.request.base.Request;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import browser.pig.cn.pigpad.bean.GoodsListBean;
+import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
+import cn.my.library.utils.util.SPUtils;
 
-public class MainActivity extends BaseActivity {
+import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_LIST;
+
+public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsClickListener {
     @Bind(R.id.tv_video)
     TextView tvVideo;
     @Bind(R.id.tv_download)
@@ -33,13 +43,15 @@ public class MainActivity extends BaseActivity {
     RecyclerView rvBz;
     private RecyclerView rv_data;
     private GoodsAdapter adapter;
-    private List<GoodsBean> list;
+    private List<GoodsListBean.GoodsBean> list;
 
     private List<StepBean> list1;
     private StepAdapter stepAdapter;
 
 
     JzvdStd video;
+
+    private GoodsListBean.GoodsBean mCurrGoods;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,13 +82,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public void initData() {
         list = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
-            GoodsBean goodsBean = new GoodsBean();
-            list.add(goodsBean);
-        }
         adapter = new GoodsAdapter(this, list);
+        adapter.setOnGoodsClickListener(this);
         rv_data.setLayoutManager(new LinearLayoutManager(this));
         rv_data.setAdapter(adapter);
+
 
 
 
@@ -94,9 +104,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public void initPresenter() {
 
-        video.setUp("https://media.w3.org/2010/05/sintel/trailer.mp4", "", JzvdStd.SCREEN_WINDOW_NORMAL);
-        video.startVideo();
-        video.thumbImageView.setImageResource(R.drawable.applog);
+
+
+       // video.thumbImageView.setImageResource(R.drawable.applog);
+
+        loadGoods();
 
     }
 
@@ -142,5 +154,43 @@ public class MainActivity extends BaseActivity {
                 tvDownload.setTextColor(Color.WHITE);
                 break;
         }
+    }
+
+    private void loadGoods() {
+        OkGo.<GoodsListBean>post(GOODS_LIST)
+                .execute(new CommonCallback<GoodsListBean>(GoodsListBean.class) {
+
+                    @Override
+                    public void onFailure(String code, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(GoodsListBean goodsListBean) {
+                        if(goodsListBean!= null){
+                            list.clear();
+                            if(goodsListBean.getData().getList()!= null && goodsListBean.getData().getList().size()>0){
+                                mCurrGoods = goodsListBean.getData().getList().get(0);
+                                mCurrGoods.setSelect(true);
+                                adapter.setLine(0);
+                                list.addAll(goodsListBean.getData().getList());
+                                tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
+                                video.setUp(mCurrGoods.getProduct_video(), "", JzvdStd.SCREEN_WINDOW_NORMAL);
+
+                            }
+
+                            adapter.notifyDataSetChanged();
+
+                        }
+
+                    }
+                });
+    }
+
+    @Override
+    public void onGoods(GoodsListBean.GoodsBean goodsBean) {
+        mCurrGoods = goodsBean;
+        tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
+        video.changeUrl(mCurrGoods.getProduct_video(),"",1000);
     }
 }
