@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +28,9 @@ import static android.view.View.GONE;
  */
 public class StepFragment extends Fragment{
     private ImageView iv_bg;
+    private LinearLayout ll_yuyin;
+
+    private AudioPlayView audioPlayView;
 
     private String audio;
     private String bg;
@@ -45,7 +49,24 @@ public class StepFragment extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_step,null);
         iv_bg = view.findViewById(R.id.iv_bg);
+        ll_yuyin = view.findViewById(R.id.ll_yuyin);
+        audioPlayView = view.findViewById(R.id.play);
+        audioPlayView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AudioPlay.getInstance().play(audio, new AudioPlay.OnAudioPlayListener() {
+                    @Override
+                    public void onAudioPlayFinish() {
 
+                    }
+
+                    @Override
+                    public void onAudioPlayError() {
+
+                    }
+                });
+            }
+        });
         return view;
     }
 
@@ -54,6 +75,13 @@ public class StepFragment extends Fragment{
         super.onActivityCreated(savedInstanceState);
 
         Glide.with(getActivity()).load(bg).into(iv_bg);
+        if(!StringUtils.isEmpty(audio)){
+            ll_yuyin.setVisibility(View.VISIBLE);
+        }else {
+            ll_yuyin.setVisibility(GONE);
+
+        }
+
 
 
     }

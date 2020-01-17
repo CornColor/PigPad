@@ -107,7 +107,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         video = findViewById(R.id.video);
         indicator = findViewById(R.id.ci);
         vp = findViewById(R.id.vp);
-        indicator.setViewPager(vp);
+
     }
 
     @Override
@@ -237,6 +237,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                           stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),fragments);
                           vp.setAdapter(stepPageAdapter);
                           vp.setCurrentItem(0);
+                          indicator.setViewPager(vp);
 
 
                         }
