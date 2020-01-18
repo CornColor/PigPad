@@ -32,6 +32,8 @@ import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import cn.jzvd.JZDataSource;
+import cn.jzvd.JZMediaManager;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
 import cn.my.library.utils.util.AppUtils;
@@ -67,7 +69,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 //    private StepAdapter stepAdapter;
 
     StepPageAdapter stepPageAdapter;
-    JzvdStd video;
+    CustomJzvd video;
 
     private GoodsListBean.GoodsBean mCurrGoods;
     private ViewPager vp;
@@ -119,8 +121,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     public void initView() {
         rv_data = findViewById(R.id.rv_data);
         video = findViewById(R.id.video);
+
+
         indicator = findViewById(R.id.ci);
         vp = findViewById(R.id.vp);
+
 
     }
 
@@ -135,10 +140,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 // 在此处添加执行的代码
                 loadXinTiao();
                 banben();
-                handler.postDelayed(this, 30*60*1000);// 50是延时时长
+                handler.postDelayed(this, 1*60*1000);// 50是延时时长
             }
         };
-        handler.postDelayed(runnable, 30*60*1000);// 打开定时器，执行操作
+        handler.postDelayed(runnable, 1*60*1000);// 打开定时器，执行操作
 
 
        // video.thumbImageView.setImageResource(R.drawable.applog);
@@ -184,6 +189,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 rV01.setVisibility(View.GONE);
                 tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
                 tvDownload.setTextColor(Color.parseColor("#61000000"));
+                JZMediaManager.start();
                 break;
             case R.id.tv_download:
                 rV.setVisibility(View.GONE);
@@ -192,6 +198,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 rV01.setVisibility(View.VISIBLE);
                 tvDownload.setBackgroundResource(R.drawable.shape_01);
                 tvDownload.setTextColor(Color.WHITE);
+                JZMediaManager.pause();
                 break;
         }
     }
@@ -291,7 +298,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 adapter.setLine(0);
                                 list.addAll(goodsListBean.getData().getList());
                                 tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
-                                video.setUp(mCurrGoods.getProduct_video(), "", JzvdStd.SCREEN_WINDOW_NORMAL);
+                                JZDataSource jzDataSource = new JZDataSource(mCurrGoods.getProduct_video(), "");
+                                jzDataSource.looping = true;
+                                video.setUp(jzDataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 loadStep(mCurrGoods.getProduct_id());
                                 video.startVideo();
 
@@ -338,7 +347,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
         mCurrGoods = goodsBean;
         tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
-        video.changeUrl(mCurrGoods.getProduct_video(),"",1000);
+        JZDataSource jzDataSource = new JZDataSource(mCurrGoods.getProduct_video(), "");
+        jzDataSource.looping = true;
+        video.changeUrl(jzDataSource,1000);
         loadStep(mCurrGoods.getProduct_id());
 
 

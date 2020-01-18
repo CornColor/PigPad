@@ -157,7 +157,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <cn.jzvd.JzvdStd
+            <browser.pig.cn.pigpad.CustomJzvd
                 android:id="@+id/video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

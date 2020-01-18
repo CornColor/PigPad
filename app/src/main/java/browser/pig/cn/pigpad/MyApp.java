@@ -20,8 +20,8 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         //当sdk版本大于等于16更换播放引擎
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-            Jzvd.setMediaInterface(new JZExoPlayer());
-        }
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+//            Jzvd.setMediaInterface(new JZExoPlayer());
+//        }
     }
 }
