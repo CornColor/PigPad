@@ -13,15 +13,20 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.liulishuo.filedownloader.BaseDownloadTask;
+import com.liulishuo.filedownloader.FileDownloadListener;
+import com.liulishuo.filedownloader.FileDownloader;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import browser.pig.cn.pigpad.bean.GoodsListBean;
 import browser.pig.cn.pigpad.bean.StepBean;
+import browser.pig.cn.pigpad.bean.VersionBean;
 import browser.pig.cn.pigpad.bean.XGoodsListBean;
 import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
@@ -29,11 +34,15 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
+import cn.my.library.utils.util.AppUtils;
+import cn.my.library.utils.util.FilePathUtil;
 import cn.my.library.utils.util.SPUtils;
+import cn.my.library.utils.util.StringUtils;
 import me.relex.circleindicator.CircleIndicator;
 
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_LIST;
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_STEP;
+import static browser.pig.cn.pigpad.net.ApiSearvice.VERSION;
 import static browser.pig.cn.pigpad.net.ApiSearvice.XINTIAO;
 
 public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsClickListener {
@@ -124,6 +133,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 // TODO Auto-generated method stub
 // 在此处添加执行的代码
                 loadXinTiao();
+                banben();
                 handler.postDelayed(this, 30*60*1000);// 50是延时时长
             }
         };
@@ -133,6 +143,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
        // video.thumbImageView.setImageResource(R.drawable.applog);
 
         loadGoods();
+        banben();
 
     }
 
@@ -156,6 +167,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onDestroy();
         ButterKnife.unbind(this);
         handler.removeCallbacks((Runnable) this);// 关闭定时器处理
+        if(AudioPlay.getInstance().isPlay()){
+            AudioPlay.getInstance().stop();
+        }
     }
 
     @OnClick({R.id.tv_video, R.id.tv_download})
@@ -180,7 +194,83 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 break;
         }
     }
+    private void banben(){
 
+        OkGo.<VersionBean>post(VERSION)
+                .execute(new CommonCallback<VersionBean>(VersionBean.class) {
+
+                    @Override
+                    public void onFailure(String code, String s) {
+                        showToast(s);
+
+                    }
+
+                    @Override
+                    public void onSuccess(VersionBean banBenBean) {
+                        try {
+                            String version = banBenBean.getData().getVersion();
+                            String appVersionName = AppUtils.getAppVersionName();
+                            if(!appVersionName.equals(version)){
+                                fileDownLoad(banBenBean.getData().getAddress());
+                            }
+                        }catch (Exception e){
+
+                        }
+
+
+                    }
+                });
+
+
+    }
+
+    private void fileDownLoad(String path) {
+        if(StringUtils.isEmpty(path)){
+            return;
+        }
+        FileDownloader.getImpl().create(path)
+                .setPath(FilePathUtil.getFilePath(this, "apk") + File.separator + "pigadp" + System.currentTimeMillis() + ".apk")
+                .setListener(new FileDownloadListener() {
+                    @Override
+                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                    }
+
+                    @Override
+                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                    }
+
+                    @Override
+                    protected void completed(BaseDownloadTask task) {
+                        try{
+                            if(!StringUtils.isEmpty(task.getPath())){
+                                AppUtils.installApp(task.getPath());
+                            }
+                        }catch (Exception e){
+
+                        }
+
+
+                    }
+
+                    @Override
+                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                    }
+
+                    @Override
+                    protected void error(BaseDownloadTask task, Throwable e) {
+
+                    }
+
+                    @Override
+                    protected void warn(BaseDownloadTask task) {
+
+                    }
+                }).start();
+
+    }
     private void loadGoods() {
         OkGo.<GoodsListBean>post(GOODS_LIST)
                 .execute(new CommonCallback<GoodsListBean>(GoodsListBean.class) {
@@ -257,6 +347,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         rV01.setVisibility(View.GONE);
         tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
         tvDownload.setTextColor(Color.parseColor("#61000000"));
+
+        if(AudioPlay.getInstance().isPlay()){
+            AudioPlay.getInstance().stop();
+        }
     }
 
     /**

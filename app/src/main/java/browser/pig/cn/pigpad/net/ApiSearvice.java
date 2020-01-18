@@ -22,6 +22,10 @@ public interface ApiSearvice {
      * 心跳
      */
     String XINTIAO = HOST+"device/heartbeat";
+    /**
+     * 版本
+     */
+    String VERSION = HOST+"padsystem/version";
 
 
 }

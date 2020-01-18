@@ -54,17 +54,22 @@ public class StepFragment extends Fragment{
         audioPlayView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AudioPlay.getInstance().play(audio, new AudioPlay.OnAudioPlayListener() {
-                    @Override
-                    public void onAudioPlayFinish() {
+                if(AudioPlay.getInstance().isPlay()){
+                    AudioPlay.getInstance().stop();
+                }else {
+                    AudioPlay.getInstance().play(audio, new AudioPlay.OnAudioPlayListener() {
+                        @Override
+                        public void onAudioPlayFinish() {
 
-                    }
+                        }
 
-                    @Override
-                    public void onAudioPlayError() {
+                        @Override
+                        public void onAudioPlayError() {
 
-                    }
-                });
+                        }
+                    });
+                }
+
             }
         });
         return view;
