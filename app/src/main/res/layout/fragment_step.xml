@@ -4,63 +4,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-        <ImageView
-            android:id="@+id/iv_bg"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-
-        android:weightSum="3"
-        android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="984:568"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-        >
-        <RelativeLayout
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/iv_bg"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        app:layout_constraintDimensionRatio="1476:852"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:weightSum="3"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         >
-        <LinearLayout
-            android:id="@+id/ll_yuyin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+            <LinearLayout
+                android:id="@+id/ll_yuyin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="vertical">
 
-        <TextView
+                <TextView
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="语音指导："
-        android:textColor="#8a000000"
-        android:textSize="14sp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="语音指导："
+                    android:textColor="#8a000000"
+                    android:textSize="14sp" />
 
-        <browser.pig.cn.pigpad.AudioPlayView
-        android:id="@+id/play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+                <browser.pig.cn.pigpad.AudioPlayView
+                    android:id="@+id/play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
 
 
-        </LinearLayout>
+            </LinearLayout>
 
 
         </RelativeLayout>
 
 
 
-        </LinearLayout>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
+
 
 
 

@@ -186,6 +186,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
                                 video.setUp(mCurrGoods.getProduct_video(), "", JzvdStd.SCREEN_WINDOW_NORMAL);
                                 loadStep(mCurrGoods.getProduct_id());
+                                video.startVideo();
 
                             }
 
@@ -200,12 +201,20 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void onGoods(GoodsListBean.GoodsBean goodsBean) {
+
         mCurrGoods = goodsBean;
         tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
         video.changeUrl(mCurrGoods.getProduct_video(),"",1000);
-        video.onStatePause();
         loadStep(mCurrGoods.getProduct_id());
 
+
+        rV.setVisibility(View.VISIBLE);
+        tvVideo.setBackgroundResource(R.drawable.shape_01);
+        tvVideo.setTextColor(Color.WHITE);
+
+        rV01.setVisibility(View.GONE);
+        tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
+        tvDownload.setTextColor(Color.parseColor("#61000000"));
     }
 
     /**
