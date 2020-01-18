@@ -35,6 +35,7 @@ import butterknife.OnClick;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
 import cn.my.library.utils.util.AppUtils;
+import cn.my.library.utils.util.DeviceUtils;
 import cn.my.library.utils.util.FilePathUtil;
 import cn.my.library.utils.util.SPUtils;
 import cn.my.library.utils.util.StringUtils;
@@ -306,6 +307,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
     private void loadXinTiao() {
         OkGo.<XGoodsListBean>post(XINTIAO)
+                .params("device_id", DeviceUtils.getAndroidID())
                 .execute(new CommonCallback<XGoodsListBean>(XGoodsListBean.class) {
 
                     @Override
