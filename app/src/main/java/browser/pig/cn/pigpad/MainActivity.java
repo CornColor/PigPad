@@ -3,6 +3,7 @@ package browser.pig.cn.pigpad;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import browser.pig.cn.pigpad.bean.GoodsListBean;
 import browser.pig.cn.pigpad.bean.StepBean;
+import browser.pig.cn.pigpad.bean.XGoodsListBean;
 import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +34,7 @@ import me.relex.circleindicator.CircleIndicator;
 
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_LIST;
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_STEP;
+import static browser.pig.cn.pigpad.net.ApiSearvice.XINTIAO;
 
 public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsClickListener {
     @Bind(R.id.tv_video)
@@ -59,6 +62,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     private GoodsListBean.GoodsBean mCurrGoods;
     private ViewPager vp;
     private  CircleIndicator indicator;
+    final Handler handler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +118,17 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     public void initPresenter() {
 
 
+        Runnable runnable = new Runnable(){
+            @Override
+            public void run() {
+// TODO Auto-generated method stub
+// 在此处添加执行的代码
+                loadXinTiao();
+                handler.postDelayed(this, 30*60*1000);// 50是延时时长
+            }
+        };
+        handler.postDelayed(runnable, 30*60*1000);// 打开定时器，执行操作
+
 
        // video.thumbImageView.setImageResource(R.drawable.applog);
 
@@ -140,6 +155,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.unbind(this);
+        handler.removeCallbacks((Runnable) this);// 关闭定时器处理
     }
 
     @OnClick({R.id.tv_video, R.id.tv_download})
@@ -198,7 +214,33 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     }
                 });
     }
+    private void loadXinTiao() {
+        OkGo.<XGoodsListBean>post(XINTIAO)
+                .execute(new CommonCallback<XGoodsListBean>(XGoodsListBean.class) {
 
+                    @Override
+                    public void onFailure(String code, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(XGoodsListBean goodsListBean) {
+                        if(goodsListBean!= null&&goodsListBean.getData().getUpdatecode() == 1){
+                            list.clear();
+                            if(goodsListBean.getData().getProducts()!= null && goodsListBean.getData().getProducts().size()>0){
+                                mCurrGoods = goodsListBean.getData().getProducts().get(0);
+                                list.addAll(goodsListBean.getData().getProducts());
+
+                            }
+
+                            adapter.notifyDataSetChanged();
+
+
+                        }
+
+                    }
+                });
+    }
     @Override
     public void onGoods(GoodsListBean.GoodsBean goodsBean) {
 
@@ -254,4 +296,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     }
                 });
     }
+
+
 }
