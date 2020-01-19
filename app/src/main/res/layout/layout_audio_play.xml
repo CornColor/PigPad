@@ -12,7 +12,7 @@
        android:id="@+id/iv_play_laba"
        android:layout_width="30dp"
        android:layout_height="28dp"
-       android:background="@drawable/icon_yuyin"
+       android:src="@drawable/y3"
        android:layout_centerVertical="true"
        android:layout_marginLeft="16dp"
        />
