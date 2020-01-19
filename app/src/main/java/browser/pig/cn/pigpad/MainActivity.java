@@ -33,6 +33,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jzvd.JZDataSource;
+import cn.jzvd.JZMediaInterface;
 import cn.jzvd.JZMediaManager;
 import cn.jzvd.JzvdStd;
 import cn.my.library.ui.base.BaseActivity;
@@ -157,7 +158,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     @Override
     protected void onPause() {
         super.onPause();
-        JzvdStd.releaseAllVideos();
+        JZMediaManager.pause();
     }
 
     @Override
@@ -168,6 +169,17 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         }
     }
 
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(JZMediaManager.getDataSource()!= null){
+            JZMediaManager.start();
+        }
+
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -176,6 +188,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(AudioPlay.getInstance().isPlay()){
             AudioPlay.getInstance().stop();
         }
+        JzvdStd.releaseAllVideos();
     }
 
     @OnClick({R.id.tv_video, R.id.tv_download})

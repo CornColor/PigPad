@@ -53,7 +53,7 @@ public class AudioPlayView extends RelativeLayout {
      * 播放
      */
     public void play(){
-    //    iv_play_laba.setImageResource(R.drawable.animation_yuyin);
+        iv_play_laba.setImageResource(R.drawable.animation_yuyin);
         animationDrawable = (AnimationDrawable) iv_play_laba.getDrawable();
         animationDrawable.start();
 
@@ -67,7 +67,7 @@ public class AudioPlayView extends RelativeLayout {
             animationDrawable.stop();
             animationDrawable = null;
         }
-    //    iv_play_laba.setImageResource(R.drawable.yuyin_03);
+        iv_play_laba.setImageResource(R.drawable.y3);
 
     }
 
