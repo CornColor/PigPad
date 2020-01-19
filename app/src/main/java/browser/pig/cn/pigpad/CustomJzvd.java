@@ -3,6 +3,7 @@ package browser.pig.cn.pigpad;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import cn.jzvd.JZDataSource;
@@ -30,7 +31,26 @@ public class CustomJzvd extends JzvdStd {
         //传入自定义布局
         return R.layout.my_play;
     }
+    @Override
+    public void setProgressAndText(int progress, long position, long duration) {
+        super.setProgressAndText(progress, position, duration);
+        change(progress);
 
+    }
+    public synchronized void change(int p){
+        if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+            if(p >=99){
+               if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
+                   changeUrl(jzDataSource.currentUrlIndex+1,1000);
+               }else {
+                   changeUrl(0,1000);
+               }
+
+
+            }
+
+        }
+    }
     @Override
     public void init(Context context) {
         super.init(context);
@@ -63,6 +83,21 @@ public class CustomJzvd extends JzvdStd {
         super.playOnThisJzvd();
         //退出全屏
         //Toast.makeText(mContext, "退出全屏", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                    //quit fullscreen
+
+                    backPress();
+
+
+                }
+                break;
+        }
+        return super.onInterceptTouchEvent(ev);
     }
 
 }
