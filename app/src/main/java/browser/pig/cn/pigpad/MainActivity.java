@@ -188,6 +188,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     }
 
+    public void onChangeX(int i){
+         if(i>=0&&i<list.size()){
+             adapter.updata(i);
+         }
+    }
+
     @Override
     public void initPresenter() {
 
@@ -232,7 +238,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     @Override
     protected void onPause() {
         super.onPause();
-        JZMediaManager.pause();
+        try{
+            JZMediaManager.pause();
+        }catch (Exception e){
+
+        }
+
     }
 
     @Override

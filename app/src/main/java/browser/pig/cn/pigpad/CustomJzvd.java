@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import cn.jzvd.JZDataSource;
+import cn.jzvd.JZMediaManager;
 import cn.jzvd.Jzvd;
 import cn.jzvd.JzvdStd;
 
@@ -37,9 +38,10 @@ public class CustomJzvd extends JzvdStd {
         change(progress);
 
     }
-    public synchronized void change(int p){
+    public  void change(int p){
         if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-            if(p >=99){
+            if(p >=40){
+                JZMediaManager.pause();
                if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
                    changeUrl(jzDataSource.currentUrlIndex+1,1000);
                }else {
@@ -89,9 +91,15 @@ public class CustomJzvd extends JzvdStd {
         switch (ev.getAction()){
             case MotionEvent.ACTION_DOWN:
                 if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                    try{
+                        backPress();
+                        ((MainActivity)mContext).onChangeX(jzDataSource.currentUrlIndex);
+                    }catch (Exception e){
+
+                    }
                     //quit fullscreen
 
-                    backPress();
+
 
 
                 }
@@ -99,5 +107,7 @@ public class CustomJzvd extends JzvdStd {
         }
         return super.onInterceptTouchEvent(ev);
     }
+
+
 
 }

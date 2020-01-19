@@ -100,7 +100,19 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
         }
         notifyDataSetChanged();
     }
+    public void updata(int id){
+        for (int i =0;i < getItemCount();i++){
+            if(id == i){
+                getDatas().get(i).setSelect(true);
+                setLine(i);
+                onGoodsClickListener.onGoods(getDatas().get(i));
+            }else {
+                getDatas().get(i).setSelect(false);
+            }
 
+        }
+        notifyDataSetChanged();
+    }
     public interface OnGoodsClickListener{
         void onGoods(GoodsListBean.GoodsBean goodsBean);
     }
