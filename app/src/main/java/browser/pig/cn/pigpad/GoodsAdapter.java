@@ -24,6 +24,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
         super(context, R.layout.item_goods, datas);
     }
     OnGoodsClickListener onGoodsClickListener;
+    private int index = 0;
 
     public void setOnGoodsClickListener(OnGoodsClickListener onGoodsClickListener) {
         this.onGoodsClickListener = onGoodsClickListener;
@@ -67,6 +68,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
             public void onClick(View v) {
                 for (int i =0;i < getItemCount();i++){
                     if(position == i){
+                        index = position;
                       getDatas().get(position).setSelect(true);
                       setLine(position);
                       onGoodsClickListener.onGoods(getDatas().get(position));
@@ -79,6 +81,24 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
             }
         });
 
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void updata(String id){
+        for (int i =0;i < getItemCount();i++){
+            if(id.equals(getDatas().get(i).getProduct_id())){
+                getDatas().get(i).setSelect(true);
+                setLine(i);
+                onGoodsClickListener.onGoods(getDatas().get(i));
+            }else {
+                getDatas().get(i).setSelect(false);
+            }
+
+        }
+        notifyDataSetChanged();
     }
 
     public interface OnGoodsClickListener{

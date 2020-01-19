@@ -26,6 +26,15 @@ public interface ApiSearvice {
      * 版本
      */
     String VERSION = HOST+"padsystem/version";
+    /**
+     * 设备录入
+     */
+    String CREATE_D = HOST+"device/create";
+
+    /**
+     * 更新完成
+     */
+    String UPDATA = HOST+"device/updated";
 
 
 }
