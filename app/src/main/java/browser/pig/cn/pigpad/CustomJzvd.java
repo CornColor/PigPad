@@ -40,7 +40,7 @@ public class CustomJzvd extends JzvdStd {
     }
     public  void change(int p){
         if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-            if(p >=40){
+            if(p >=99){
                 JZMediaManager.pause();
                if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
                    changeUrl(jzDataSource.currentUrlIndex+1,1000);

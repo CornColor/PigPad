@@ -1,25 +1,24 @@
 package browser.pig.cn.pigpad;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.Response;
-import com.lzy.okgo.request.base.Request;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,7 +36,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.jzvd.JZDataSource;
-import cn.jzvd.JZMediaInterface;
 import cn.jzvd.JZMediaManager;
 import cn.jzvd.Jzvd;
 import cn.jzvd.JzvdStd;
@@ -46,7 +44,6 @@ import cn.my.library.ui.base.BaseActivity;
 import cn.my.library.utils.util.AppUtils;
 import cn.my.library.utils.util.DeviceUtils;
 import cn.my.library.utils.util.FilePathUtil;
-import cn.my.library.utils.util.SPUtils;
 import cn.my.library.utils.util.StringUtils;
 import me.relex.circleindicator.CircleIndicator;
 
@@ -69,6 +66,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     RelativeLayout rV;
     @Bind(R.id.r_v_01)
     RelativeLayout rV01;
+    @Bind(R.id.tv_code)
+    TextView tvCode;
 
     //   RecyclerView rvBz;
     private RecyclerView rv_data;
@@ -83,7 +82,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     private GoodsListBean.GoodsBean mCurrGoods;
     private ViewPager vp;
-    private  CircleIndicator indicator;
+    private CircleIndicator indicator;
     final Handler handler = new Handler();
 
     private Timer timer;
@@ -110,6 +109,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        tvCode.setText("设备码:"+DeviceUtils.getAndroidID());
 //        list1 = new ArrayList<>();
 //        for (int i = 0; i < 4; i++) {
 //            StepBean goodsBean = new StepBean();
@@ -125,16 +125,16 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         create_d();
 
 
-
-
 // optional
         // adapter.registerAdapterDataObserver(indicator.getAdapterDataObserver());
     }
+
     private void initTimer() {
         // 初始化计时器
         task = new MyTask();
         timer = new Timer();
     }
+
     private void startTimer() {
         //启动计时器
         /**
@@ -144,11 +144,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
          */
         initTimer();
         try {
-            timer.schedule(task, 10*1000);
+            timer.schedule(task, 10 * 1000);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             initTimer();
-            timer.schedule(task, 10*1000 );
+            timer.schedule(task, 10 * 1000);
         }
     }
 
@@ -181,36 +181,33 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         video = findViewById(R.id.video);
 
 
-
         indicator = findViewById(R.id.ci);
         vp = findViewById(R.id.vp);
 
 
-
-
     }
 
-    public void onChangeX(int i){
-         if(i>=0&&i<list.size()){
-             adapter.updata(i);
-         }
+    public void onChangeX(int i) {
+        if (i >= 0 && i < list.size()) {
+            adapter.updata(i);
+        }
     }
 
     @Override
     public void initPresenter() {
 
 
-        Runnable runnable = new Runnable(){
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
 // TODO Auto-generated method stub
 // 在此处添加执行的代码
                 loadXinTiao();
                 banben();
-                handler.postDelayed(this, 1*60*1000);// 50是延时时长
+                handler.postDelayed(this, 1 * 60 * 1000);// 50是延时时长
             }
         };
-        handler.postDelayed(runnable, 1*60*1000);// 打开定时器，执行操作
+        handler.postDelayed(runnable, 1 * 60 * 1000);// 打开定时器，执行操作
 
 
         // video.thumbImageView.setImageResource(R.drawable.applog);
@@ -223,7 +220,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        switch (ev.getAction()){
+        switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 stopTimer();
                 break;
@@ -235,14 +232,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
 
-
-
     @Override
     protected void onPause() {
         super.onPause();
-        try{
+        try {
             JZMediaManager.pause();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
 
@@ -257,11 +252,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
 
-
     @Override
     protected void onResume() {
         super.onResume();
-        if(JZMediaManager.getDataSource()!= null){
+        if (JZMediaManager.getDataSource() != null) {
             JZMediaManager.start();
         }
         startTimer();
@@ -273,7 +267,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onDestroy();
         ButterKnife.unbind(this);
         handler.removeCallbacks((Runnable) this);// 关闭定时器处理
-        if(AudioPlay.getInstance().isPlay()){
+        if (AudioPlay.getInstance().isPlay()) {
             AudioPlay.getInstance().stop();
         }
         JzvdStd.releaseAllVideos();
@@ -303,7 +297,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 break;
         }
     }
-    private void banben(){
+
+    private void banben() {
 
         OkGo.<VersionBean>post(VERSION)
                 .execute(new CommonCallback<VersionBean>(VersionBean.class) {
@@ -319,10 +314,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                         try {
                             String version = banBenBean.getData().getVersion();
                             String appVersionName = AppUtils.getAppVersionName();
-                            if(!appVersionName.equals(version)){
+                            if (!appVersionName.equals(version)) {
                                 fileDownLoad(banBenBean.getData().getAddress());
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -332,17 +327,18 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
     }
-    private void create_d(){
+
+    private void create_d() {
         OkGo.<BaseBean>post(CREATE_D)
-                .params("device_id",DeviceUtils.getAndroidID())
+                .params("device_id", DeviceUtils.getAndroidID())
                 .execute(new CommonCallback<BaseBean>(BaseBean.class) {
 
                     @Override
                     public void onFailure(String code, String s) {
 
-                        if(code.equals("4003")){
+                        if (code.equals("4003")) {
 
-                        }else {
+                        } else {
                             showToast(s);
                             create_d();
                         }
@@ -365,10 +361,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
     }
-    private void updata(String product_id){
+
+    private void updata(String product_id) {
         OkGo.<BaseBean>post(UPDATA)
-                .params("device_id",DeviceUtils.getAndroidID())
-                .params("product_id",product_id)
+                .params("device_id", DeviceUtils.getAndroidID())
+                .params("product_id", product_id)
                 .execute(new CommonCallback<BaseBean>(BaseBean.class) {
 
                     @Override
@@ -391,8 +388,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
     }
+
     private void fileDownLoad(String path) {
-        if(StringUtils.isEmpty(path)){
+        if (StringUtils.isEmpty(path)) {
             return;
         }
         FileDownloader.getImpl().create(path)
@@ -410,11 +408,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
-                        try{
-                            if(!StringUtils.isEmpty(task.getPath())){
+                        try {
+                            if (!StringUtils.isEmpty(task.getPath())) {
                                 AppUtils.installApp(task.getPath());
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
 
                         }
 
@@ -438,6 +436,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 }).start();
 
     }
+
     private void loadGoods() {
         OkGo.<GoodsListBean>post(GOODS_LIST)
                 .execute(new CommonCallback<GoodsListBean>(GoodsListBean.class) {
@@ -449,30 +448,30 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                     @Override
                     public void onSuccess(GoodsListBean goodsListBean) {
-                        if(goodsListBean!= null){
+                        if (goodsListBean != null) {
                             list.clear();
-                            if(goodsListBean.getData().getList()!= null && goodsListBean.getData().getList().size()>0){
+                            if (goodsListBean.getData().getList() != null && goodsListBean.getData().getList().size() > 0) {
                                 mCurrGoods = goodsListBean.getData().getList().get(0);
                                 mCurrGoods.setSelect(true);
                                 adapter.setLine(0);
                                 list.addAll(goodsListBean.getData().getList());
-                                tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
+                                tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
 //                                JZDataSource jzDataSource = new JZDataSource(mCurrGoods.getProduct_video(), "");
 //                                jzDataSource.looping = true;
 //                                video.setUp(jzDataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
 
-                                LinkedHashMap<String,String> map = new LinkedHashMap<>();
-                                if(list!= null&&list.size()>0){
-                                    for (int i = 0; i<list.size();i++){
+                                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                                if (list != null && list.size() > 0) {
+                                    for (int i = 0; i < list.size(); i++) {
                                         map.put(list.get(i).getProduct_id(),
                                                 list.get(i).getProduct_video());
 
                                     }
 
                                 }
-                                JZDataSource dataSource = new JZDataSource(map,"");
+                                JZDataSource dataSource = new JZDataSource(map, "");
                                 dataSource.looping = true;
-                                video.setUp(dataSource,JzvdStd.SCREEN_WINDOW_NORMAL);
+                                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
                                 loadStep(mCurrGoods.getProduct_id());
                                 video.startVideo();
@@ -488,6 +487,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     }
                 });
     }
+
     private void loadXinTiao() {
         OkGo.<XGoodsListBean>post(XINTIAO)
                 .params("device_id", DeviceUtils.getAndroidID())
@@ -500,31 +500,31 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                     @Override
                     public void onSuccess(XGoodsListBean goodsListBean) {
-                        if(goodsListBean!= null&&goodsListBean.getData().getUpdatecode() == 1){
+                        if (goodsListBean != null && goodsListBean.getData().getUpdatecode() == 1) {
                             list.clear();
-                            if(goodsListBean.getData().getProducts()!= null && goodsListBean.getData().getProducts().size()>0){
+                            if (goodsListBean.getData().getProducts() != null && goodsListBean.getData().getProducts().size() > 0) {
                                 mCurrGoods = goodsListBean.getData().getProducts().get(0);
                                 list.addAll(goodsListBean.getData().getProducts());
-                                if(video.currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                                if (video.currentScreen == SCREEN_WINDOW_FULLSCREEN) {
                                     Jzvd.backPress();
                                 }
                                 adapter.setLine(0);
                                 JZMediaManager.pause();
-                                LinkedHashMap<String,String> map = new LinkedHashMap<>();
-                                if(list!= null&&list.size()>0){
-                                    for (int i = 0; i<list.size();i++){
+                                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                                if (list != null && list.size() > 0) {
+                                    for (int i = 0; i < list.size(); i++) {
                                         map.put(list.get(i).getProduct_id(),
                                                 list.get(i).getProduct_video());
 
                                     }
 
                                 }
-                                JZDataSource dataSource = new JZDataSource(map,"");
+                                JZDataSource dataSource = new JZDataSource(map, "");
                                 dataSource.looping = true;
-                                video.setUp(dataSource,JzvdStd.SCREEN_WINDOW_NORMAL);
+                                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
 
-                                for (int i = 0 ; i< goodsListBean.getData().getProducts().size();i++){
+                                for (int i = 0; i < goodsListBean.getData().getProducts().size(); i++) {
                                     updata(goodsListBean.getData().getProducts().get(i).getProduct_id());
                                 }
 
@@ -538,12 +538,13 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     }
                 });
     }
+
     @Override
-    public void onGoods(GoodsListBean.GoodsBean goodsBean,int i) {
+    public void onGoods(GoodsListBean.GoodsBean goodsBean, int i) {
 
         mCurrGoods = goodsBean;
-        tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
-        video.changeUrl(i,1000);
+        tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
+        video.changeUrl(i, 1000);
         loadStep(mCurrGoods.getProduct_id());
 
 
@@ -555,7 +556,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
         tvDownload.setTextColor(Color.parseColor("#61000000"));
 
-        if(AudioPlay.getInstance().isPlay()){
+        if (AudioPlay.getInstance().isPlay()) {
             AudioPlay.getInstance().stop();
         }
     }
@@ -563,11 +564,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     /**
      * 加载步骤
+     *
      * @param id
      */
-    private void loadStep(String id){
+    private void loadStep(String id) {
         OkGo.<StepBean>post(GOODS_STEP)
-                .params("product_id",id)
+                .params("product_id", id)
                 .execute(new CommonCallback<StepBean>(StepBean.class) {
 
                     @Override
@@ -577,17 +579,17 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                     @Override
                     public void onSuccess(StepBean goodsListBean) {
-                        if(goodsListBean!= null){
+                        if (goodsListBean != null) {
                             List<Fragment> fragments = new ArrayList<>();
-                            for (int i = 0;i < goodsListBean.getData().getList().size();i++){
+                            for (int i = 0; i < goodsListBean.getData().getList().size(); i++) {
                                 StepFragment stepFragment = new StepFragment();
                                 Bundle bundle = new Bundle();
-                                bundle.putString("audio",goodsListBean.getData().getList().get(i).getStep_voice());
-                                bundle.putString("bg",goodsListBean.getData().getList().get(i).getStep_img());
+                                bundle.putString("audio", goodsListBean.getData().getList().get(i).getStep_voice());
+                                bundle.putString("bg", goodsListBean.getData().getList().get(i).getStep_img());
                                 stepFragment.setArguments(bundle);
                                 fragments.add(stepFragment);
                             }
-                            stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),fragments);
+                            stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
                             vp.setAdapter(stepPageAdapter);
                             vp.setCurrentItem(0);
                             indicator.setViewPager(vp);
@@ -600,4 +602,23 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
 
+    final static int COUNTS = 5;// 点击次数
+    final static long DURATION = 5000;// 规定有效时间
+    long[] mHits = new long[COUNTS];
+    @OnClick(R.id.title)
+    public void onViewClicked() {
+        continuousClick(COUNTS, DURATION);
+
+    }
+    private void continuousClick(int count, long time) {
+        //每次点击时，数组向前移动一位
+        System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
+        //为数组最后一位赋值
+        mHits[mHits.length - 1] = SystemClock.uptimeMillis();
+        if (mHits[0] >= (SystemClock.uptimeMillis() - DURATION)) {
+            mHits = new long[COUNTS];//重新初始化数组
+            Toast.makeText(this, "心跳", Toast.LENGTH_LONG).show();
+            loadXinTiao();
+        }
+    }
 }
