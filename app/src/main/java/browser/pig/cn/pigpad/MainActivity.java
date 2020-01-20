@@ -519,12 +519,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 });
     }
     @Override
-    public void onGoods(GoodsListBean.GoodsBean goodsBean) {
+    public void onGoods(GoodsListBean.GoodsBean goodsBean,int i) {
 
         mCurrGoods = goodsBean;
         tVideoName.setText("“"+mCurrGoods.getProduct_name()+"”"+"介绍视频");
-        JZDataSource jzDataSource = new JZDataSource(mCurrGoods.getProduct_video(), "");
-        video.changeUrl(jzDataSource,1000);
+        video.changeUrl(i,1000);
         loadStep(mCurrGoods.getProduct_id());
 
 

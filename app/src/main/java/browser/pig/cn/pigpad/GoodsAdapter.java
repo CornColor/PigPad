@@ -71,7 +71,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
                         index = position;
                       getDatas().get(position).setSelect(true);
                       setLine(position);
-                      onGoodsClickListener.onGoods(getDatas().get(position));
+                      onGoodsClickListener.onGoods(getDatas().get(position),i);
                     }else {
                         getDatas().get(i).setSelect(false);
                     }
@@ -92,7 +92,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
             if(id.equals(getDatas().get(i).getProduct_id())){
                 getDatas().get(i).setSelect(true);
                 setLine(i);
-                onGoodsClickListener.onGoods(getDatas().get(i));
+                onGoodsClickListener.onGoods(getDatas().get(i),i);
             }else {
                 getDatas().get(i).setSelect(false);
             }
@@ -105,7 +105,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
             if(id == i){
                 getDatas().get(i).setSelect(true);
                 setLine(i);
-                onGoodsClickListener.onGoods(getDatas().get(i));
+                onGoodsClickListener.onGoods(getDatas().get(i),i);
             }else {
                 getDatas().get(i).setSelect(false);
             }
@@ -114,7 +114,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsListBean.GoodsBean> {
         notifyDataSetChanged();
     }
     public interface OnGoodsClickListener{
-        void onGoods(GoodsListBean.GoodsBean goodsBean);
+        void onGoods(GoodsListBean.GoodsBean goodsBean,int i);
     }
 
     public void setLine(int position){
