@@ -39,6 +39,7 @@ import butterknife.OnClick;
 import cn.jzvd.JZDataSource;
 import cn.jzvd.JZMediaInterface;
 import cn.jzvd.JZMediaManager;
+import cn.jzvd.Jzvd;
 import cn.jzvd.JzvdStd;
 import cn.my.library.net.BaseBean;
 import cn.my.library.ui.base.BaseActivity;
@@ -55,6 +56,7 @@ import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_STEP;
 import static browser.pig.cn.pigpad.net.ApiSearvice.UPDATA;
 import static browser.pig.cn.pigpad.net.ApiSearvice.VERSION;
 import static browser.pig.cn.pigpad.net.ApiSearvice.XINTIAO;
+import static cn.jzvd.Jzvd.SCREEN_WINDOW_FULLSCREEN;
 
 public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsClickListener {
     @Bind(R.id.tv_video)
@@ -503,6 +505,24 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                             if(goodsListBean.getData().getProducts()!= null && goodsListBean.getData().getProducts().size()>0){
                                 mCurrGoods = goodsListBean.getData().getProducts().get(0);
                                 list.addAll(goodsListBean.getData().getProducts());
+                                if(video.currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                                    Jzvd.backPress();
+                                }
+                                adapter.setLine(0);
+                                JZMediaManager.pause();
+                                LinkedHashMap<String,String> map = new LinkedHashMap<>();
+                                if(list!= null&&list.size()>0){
+                                    for (int i = 0; i<list.size();i++){
+                                        map.put(list.get(i).getProduct_id(),
+                                                list.get(i).getProduct_video());
+
+                                    }
+
+                                }
+                                JZDataSource dataSource = new JZDataSource(map,"");
+                                dataSource.looping = true;
+                                video.setUp(dataSource,JzvdStd.SCREEN_WINDOW_NORMAL);
+                                video.startVideo();
 
                                 for (int i = 0 ; i< goodsListBean.getData().getProducts().size();i++){
                                     updata(goodsListBean.getData().getProducts().get(i).getProduct_id());
