@@ -1,4 +1,4 @@
-package cn.my.library.utils.db;
+package browser.pig.cn.pigpad.db;
 
 import android.database.sqlite.SQLiteException;
 import android.util.Log;

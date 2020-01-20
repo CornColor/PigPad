@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.multidex.MultiDex;
 
+import browser.pig.cn.pigpad.db.DbHelper;
 import cn.jzvd.Jzvd;
 
 /**
@@ -19,6 +20,7 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        DbHelper.getInstance().init(this);
         //当sdk版本大于等于16更换播放引擎
 //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
 //            Jzvd.setMediaInterface(new JZExoPlayer());

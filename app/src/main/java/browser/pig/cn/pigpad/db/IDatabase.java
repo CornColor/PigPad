@@ -1,4 +1,4 @@
-package cn.my.library.utils.db;
+package browser.pig.cn.pigpad.db;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.annotation.NotNull;

@@ -21,15 +21,15 @@ public class XGoodsListBean extends BaseBean {
     }
 
     public static class DataBean{
-        private List<GoodsListBean.GoodsBean> products;
+        private List<GoodsBean> products;
         private int updatecode;
 
-        public List<GoodsListBean.GoodsBean> getProducts() {
+        public List<GoodsBean> getProducts() {
             return products;
         }
 
 
-        public void setProducts(List<GoodsListBean.GoodsBean> products) {
+        public void setProducts(List<GoodsBean> products) {
             this.products = products;
         }
 
