@@ -62,7 +62,7 @@ public class CustomJzvd extends JzvdStd {
     public void onAutoCompletion() {
         super.onAutoCompletion();
         //播放下一集 在这里切换url
-        post(new Runnable() {
+        postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
@@ -77,7 +77,7 @@ public class CustomJzvd extends JzvdStd {
                     changeUrl(jzDataSource.currentUrlIndex,0);
                 }
             }
-        });
+        },500);
 
     }
 

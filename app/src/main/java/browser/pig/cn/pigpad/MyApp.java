@@ -10,6 +10,7 @@ import com.liulishuo.filedownloader.FileDownloader;
 import browser.pig.cn.pigpad.CustomMediaPlayer.CustomMediaPlayerAssertFolder;
 import browser.pig.cn.pigpad.CustomMediaPlayer.JZMediaIjkplayer;
 import browser.pig.cn.pigpad.db.DbHelper;
+import cn.jzvd.JZMediaSystem;
 import cn.jzvd.Jzvd;
 
 /**
@@ -31,6 +32,6 @@ public class MyApp extends Application {
       //      Jzvd.setMediaInterface(new JZExoPlayer());
       //  }
        // Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
-        Jzvd.setMediaInterface(new JZMediaIjkplayer());
+        Jzvd.setMediaInterface(new JZMediaSystem());
     }
 }
