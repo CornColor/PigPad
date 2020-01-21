@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,12 +30,9 @@ import java.util.TimerTask;
 
 import browser.pig.cn.pigpad.bean.GoodsBean;
 import browser.pig.cn.pigpad.bean.GoodsListBean;
-import browser.pig.cn.pigpad.bean.StepABean;
 import browser.pig.cn.pigpad.bean.StepBean;
 import browser.pig.cn.pigpad.bean.VersionBean;
 import browser.pig.cn.pigpad.bean.XGoodsListBean;
-import browser.pig.cn.pigpad.db.DbHelper;
-import browser.pig.cn.pigpad.db.StepABeanDao;
 import browser.pig.cn.pigpad.net.CommonCallback;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -50,8 +46,6 @@ import cn.my.library.ui.base.BaseActivity;
 import cn.my.library.utils.util.AppUtils;
 import cn.my.library.utils.util.DeviceUtils;
 import cn.my.library.utils.util.FilePathUtil;
-import cn.my.library.utils.util.FileUtils;
-import cn.my.library.utils.util.NetworkUtils;
 import cn.my.library.utils.util.StringUtils;
 import me.relex.circleindicator.CircleIndicator;
 
@@ -117,6 +111,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        requestPermission(Permission.Group.STORAGE,Permission.Group.CAMERA);
+        requestPermission(new String[]{"android.permission.WRITE_SETTINGS"});
         tvCode.setText("设备码:"+DeviceUtils.getAndroidID());
 //        list1 = new ArrayList<>();
 //        for (int i = 0; i < 4; i++) {
@@ -176,13 +172,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void initData() {
-        requestPermission(Permission.Group.STORAGE,Permission.Group.CAMERA);
-        requestPermission(new String[]{"android.permission.WRITE_SETTINGS"});
         list = new ArrayList<>();
-       List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
-       if(lgoods!= null){
-           list.addAll(lgoods);
-       }
         adapter = new GoodsAdapter(this, list);
         adapter.setOnGoodsClickListener(this);
         rv_data.setLayoutManager(new LinearLayoutManager(this));
@@ -313,9 +303,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void banben() {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
+
         OkGo.<VersionBean>post(VERSION)
                 .execute(new CommonCallback<VersionBean>(VersionBean.class) {
 
@@ -345,10 +333,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void create_d() {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
-
         OkGo.<BaseBean>post(CREATE_D)
                 .params("device_id", DeviceUtils.getAndroidID())
                 .execute(new CommonCallback<BaseBean>(BaseBean.class) {
@@ -383,9 +367,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void updata(String product_id) {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
         OkGo.<BaseBean>post(UPDATA)
                 .params("device_id", DeviceUtils.getAndroidID())
                 .params("product_id", product_id)
@@ -413,9 +394,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void fileDownLoad(String path) {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
         if (StringUtils.isEmpty(path)) {
             return;
         }
@@ -464,9 +442,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void loadGoods() {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
         OkGo.<GoodsListBean>post(GOODS_LIST)
                 .execute(new CommonCallback<GoodsListBean>(GoodsListBean.class) {
 
@@ -484,31 +459,22 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 mCurrGoods.setSelect(true);
                                 adapter.setLine(0);
                                 list.addAll(goodsListBean.getData().getList());
-
-
                                 tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
 //                                JZDataSource jzDataSource = new JZDataSource(mCurrGoods.getProduct_video(), "");
 //                                jzDataSource.looping = true;
 //                                video.setUp(jzDataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                                DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
+
                                 LinkedHashMap<String, String> map = new LinkedHashMap<>();
                                 if (list != null && list.size() > 0) {
                                     for (int i = 0; i < list.size(); i++) {
-                                        //插入数据库
-                                        DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
-                                        if(!downLoadGoods(list.get(i))){
-                                            map.put(list.get(i).getProduct_id(),
-                                                    getLoctionPath(list.get(i)));
-                                        }else {
-                                            map.put(list.get(i).getProduct_id(),
-                                                    list.get(i).getProduct_video());
-                                        }
-
+                                        map.put(list.get(i).getProduct_id(),
+                                                list.get(i).getProduct_video());
 
                                     }
 
                                 }
                                 JZDataSource dataSource = new JZDataSource(map, "");
+                                dataSource.looping = true;
                                 video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
                                 loadStep(mCurrGoods.getProduct_id());
@@ -527,9 +493,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void loadXinTiao() {
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
         OkGo.<XGoodsListBean>post(XINTIAO)
                 .params("device_id", DeviceUtils.getAndroidID())
                 .execute(new CommonCallback<XGoodsListBean>(XGoodsListBean.class) {
@@ -552,22 +515,16 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 adapter.setLine(0);
                                 JZMediaManager.pause();
                                 LinkedHashMap<String, String> map = new LinkedHashMap<>();
-                                DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
                                 if (list != null && list.size() > 0) {
                                     for (int i = 0; i < list.size(); i++) {
-                                        DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
-                                        if(!downLoadGoods(list.get(i))){
-                                            map.put(list.get(i).getProduct_id(),
-                                                    getLoctionPath(list.get(i)));
-                                        }else {
-                                            map.put(list.get(i).getProduct_id(),
-                                                    list.get(i).getProduct_video());
-                                        }
+                                        map.put(list.get(i).getProduct_id(),
+                                                list.get(i).getProduct_video());
 
                                     }
 
                                 }
                                 JZDataSource dataSource = new JZDataSource(map, "");
+                                dataSource.looping = true;
                                 video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
 
@@ -610,116 +567,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
     /**
-     * 下载文件
-     * @param path
-     * @param id
-     */
-    private void zyFlieDownLoad(String path,String id){
-        if(!NetworkUtils.isConnected()){
-            return;
-        }
-        if (StringUtils.isEmpty(path)) {
-            return;
-        }
-        FileDownloader.getImpl().create(path)
-                .setPath(FilePathUtil.getFilePath(this, id) + File.separator + FileUtils.getFileNameByUrl(path)  + FileUtils.getFileNameWithSuffix(path))
-                .setListener(new FileDownloadListener() {
-                    @Override
-                    protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
-                    }
-
-                    @Override
-                    protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
-                    }
-
-                    @Override
-                    protected void completed(BaseDownloadTask task) {
-
-
-                    }
-
-                    @Override
-                    protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
-
-                    }
-
-                    @Override
-                    protected void error(BaseDownloadTask task, Throwable e) {
-
-                    }
-
-                    @Override
-                    protected void warn(BaseDownloadTask task) {
-
-                    }
-                }).start();
-
-    }
-
-
-   private boolean downLoadGoods(GoodsBean goodsBean){
-        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getProduct_video())  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video())))){
-            zyFlieDownLoad(goodsBean.getProduct_video(),goodsBean.getProduct_id());
-            return true;
-        }
-        return false;
-   }
-
-
-    private boolean downLoadStep(StepABean goodsBean){
-        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getStep_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice())))){
-            zyFlieDownLoad(goodsBean.getStep_voice(),goodsBean.getStep_id());
-            return true;
-        }
-        return false;
-    }
-   public String getLoctionPath(GoodsBean goodsBean){
-       return FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-               + File.separator + FileUtils.getFileNameByUrl(goodsBean.getProduct_video())  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video());
-   }
-
-    public String getLoctionPath(StepABean goodsBean){
-        return FilePathUtil.getFilePath(this, goodsBean.getStep_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice());
-    }
-
-
-    /**
      * 加载步骤
      *
      * @param id
      */
     private void loadStep(String id) {
-        if(!NetworkUtils.isConnected()){
-            List<StepABean> list =   DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(id)).build().list();
-            if(list!= null){
-                List<Fragment> fragments = new ArrayList<>();
-                for (int i = 0; i < list.size(); i++) {
-                    DbHelper.getInstance().stepABeanLongDBManager().insert(list.get(i));
-                    StepFragment stepFragment = new StepFragment();
-                    Bundle bundle = new Bundle();
-                    if(!downLoadStep(list.get(i))){
-                        bundle.putString("audio",getLoctionPath(list.get(i)));
-                    }else {
-                        bundle.putString("audio", list.get(i).getStep_voice());
-                    }
-                    bundle.putString("bg", list.get(i).getStep_img());
-                    stepFragment.setArguments(bundle);
-                    fragments.add(stepFragment);
-                }
-                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
-                vp.setAdapter(stepPageAdapter);
-                vp.setCurrentItem(0);
-                indicator.setViewPager(vp);
-            }
-
-
-            return;
-        }
         OkGo.<StepBean>post(GOODS_STEP)
                 .params("product_id", id)
                 .execute(new CommonCallback<StepBean>(StepBean.class) {
@@ -734,14 +586,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                         if (goodsListBean != null) {
                             List<Fragment> fragments = new ArrayList<>();
                             for (int i = 0; i < goodsListBean.getData().getList().size(); i++) {
-                                DbHelper.getInstance().stepABeanLongDBManager().insert(goodsListBean.getData().getList().get(i));
                                 StepFragment stepFragment = new StepFragment();
                                 Bundle bundle = new Bundle();
-                                if(!downLoadStep(goodsListBean.getData().getList().get(i))){
-                                    bundle.putString("audio",getLoctionPath(goodsListBean.getData().getList().get(i)));
-                                }else {
-                                    bundle.putString("audio", goodsListBean.getData().getList().get(i).getStep_voice());
-                                }
+                                bundle.putString("audio", goodsListBean.getData().getList().get(i).getStep_voice());
                                 bundle.putString("bg", goodsListBean.getData().getList().get(i).getStep_img());
                                 stepFragment.setArguments(bundle);
                                 fragments.add(stepFragment);
