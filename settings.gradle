@@ -1,1 +1,1 @@
-include ':app',':mylibrary',':dialoglibrary',':circleindicator'
+include ':app',':mylibrary',':dialoglibrary',':circleindicator',':jiaozivideoplayer'

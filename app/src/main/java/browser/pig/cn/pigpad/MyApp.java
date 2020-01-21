@@ -5,6 +5,10 @@ import android.content.Context;
 import android.os.Build;
 import android.support.multidex.MultiDex;
 
+import com.liulishuo.filedownloader.FileDownloader;
+
+import browser.pig.cn.pigpad.CustomMediaPlayer.CustomMediaPlayerAssertFolder;
+import browser.pig.cn.pigpad.CustomMediaPlayer.JZMediaIjkplayer;
 import browser.pig.cn.pigpad.db.DbHelper;
 import cn.jzvd.Jzvd;
 
@@ -21,9 +25,12 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         DbHelper.getInstance().init(this);
-        //当sdk版本大于等于16更换播放引擎
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-//            Jzvd.setMediaInterface(new JZExoPlayer());
-//        }
+        FileDownloader.setup(this);
+        //当sdk版本大于等于16更换播放引擎.
+       // if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+      //      Jzvd.setMediaInterface(new JZExoPlayer());
+      //  }
+       // Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
+        Jzvd.setMediaInterface(new JZMediaIjkplayer());
     }
 }

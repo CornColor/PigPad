@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import com.yanzhenjie.permission.Permission;
+
 import cn.my.library.other.WeakReferenceHandle;
 import cn.my.library.ui.base.BaseActivity;
 
@@ -28,7 +30,7 @@ public class WelcomeActivity extends BaseActivity  implements Handler.Callback{
 
     @Override
     public void initData() {
-
+        requestPermission(Permission.Group.STORAGE);
     }
 
     @Override

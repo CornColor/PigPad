@@ -55,51 +55,61 @@ public class JZExoPlayer extends JZMediaInterface implements Player.EventListene
 
     @Override
     public void start() {
-        simpleExoPlayer.setPlayWhenReady(true);
+        try {
+            simpleExoPlayer.setPlayWhenReady(true);
+        }catch (Exception e){
+
+        }
+
     }
 
     @Override
     public void prepare() {
         Log.e(TAG, "prepare");
-        mainHandler = new Handler();
-        Context context = JzvdMgr.getCurrentJzvd().getContext();
+        try{
+            mainHandler = new Handler();
+            Context context = JzvdMgr.getCurrentJzvd().getContext();
 
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            TrackSelector trackSelector =
+                    new DefaultTrackSelector(videoTrackSelectionFactory);
 
-        LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE),
-                360000, 600000, 1000, 5000,
-                C.LENGTH_UNSET,
-                false);
+            LoadControl loadControl = new DefaultLoadControl(new DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE),
+                    360000, 600000, 1000, 5000,
+                    C.LENGTH_UNSET,
+                    false);
 
-        // 2. Create the player
+            // 2. Create the player
 
-        RenderersFactory renderersFactory = new DefaultRenderersFactory(context);
-        simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl);
-        // Produces DataSource instances through which media data is loaded.
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, context.getResources().getString(R.string.app_name)));
+            RenderersFactory renderersFactory = new DefaultRenderersFactory(context);
+            simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector, loadControl);
+            // Produces DataSource instances through which media data is loaded.
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                    Util.getUserAgent(context, context.getResources().getString(R.string.app_name)));
 
-        String currUrl = jzDataSource.getCurrentUrl().toString();
-        if (currUrl.contains(".m3u8")) {
-            videoSource = new HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(currUrl), mainHandler, null);
-        } else {
-            videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(currUrl));
+            String currUrl = jzDataSource.getCurrentUrl().toString();
+            if (currUrl.contains(".m3u8")) {
+                videoSource = new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(currUrl), mainHandler, null);
+            } else {
+                videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(currUrl));
+            }
+            simpleExoPlayer.addVideoListener(this);
+
+            Log.e(TAG, "URL Link = " + currUrl);
+
+            simpleExoPlayer.addListener(this);
+
+            simpleExoPlayer.prepare(videoSource);
+            simpleExoPlayer.setPlayWhenReady(true);
+            callback = new onBufferingUpdate();
+        }catch (Exception e){
+
         }
-        simpleExoPlayer.addVideoListener(this);
 
-        Log.e(TAG, "URL Link = " + currUrl);
-
-        simpleExoPlayer.addListener(this);
-
-        simpleExoPlayer.prepare(videoSource);
-        simpleExoPlayer.setPlayWhenReady(true);
-        callback = new onBufferingUpdate();
     }
 
     @Override
@@ -143,7 +153,12 @@ public class JZExoPlayer extends JZMediaInterface implements Player.EventListene
 
     @Override
     public void pause() {
-        simpleExoPlayer.setPlayWhenReady(false);
+        try {
+            simpleExoPlayer.setPlayWhenReady(false);
+        }catch (Exception e){
+
+        }
+
     }
 
     @Override

@@ -32,32 +32,12 @@ public class CustomJzvd extends JzvdStd {
         //传入自定义布局
         return R.layout.my_play;
     }
+
     @Override
-    public void setProgressAndText(int progress, long position, long duration) {
-        super.setProgressAndText(progress, position, duration);
-        change(progress);
-
+    public void onStateError() {
+        super.onStateError();
     }
-    public  void change(int p){
-        if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-            if(p >=99){
-                JZMediaManager.pause();
-               if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
-                   changeUrl(jzDataSource.currentUrlIndex+1,1000);
-               }else {
-                   changeUrl(0,1000);
-               }
 
-
-            }
-
-        }else {
-            if(p >=99){
-                JZMediaManager.pause();
-                    changeUrl(jzDataSource.currentUrlIndex,1000);
-            }
-        }
-    }
     @Override
     public void init(Context context) {
         super.init(context);
@@ -77,10 +57,28 @@ public class CustomJzvd extends JzvdStd {
         Jzvd.NORMAL_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
     }
 
+
     @Override
     public void onAutoCompletion() {
         super.onAutoCompletion();
         //播放下一集 在这里切换url
+        post(new Runnable() {
+            @Override
+            public void run() {
+                if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                    if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
+                        int index = jzDataSource.currentUrlIndex+1;
+                        changeUrl(index,0);
+                    }else {
+                        changeUrl(0,0);
+                    }
+
+                }else {
+                    changeUrl(jzDataSource.currentUrlIndex,0);
+                }
+            }
+        });
+
     }
 
 
