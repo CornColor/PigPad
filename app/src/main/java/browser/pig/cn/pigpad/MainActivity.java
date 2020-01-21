@@ -20,6 +20,7 @@ import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.Response;
+import com.yanzhenjie.permission.Permission;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -113,7 +114,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -176,6 +176,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void initData() {
+        requestPermission(Permission.Group.STORAGE,Permission.Group.CAMERA);
+        requestPermission(new String[]{"android.permission.WRITE_SETTINGS"});
         list = new ArrayList<>();
        List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
        if(lgoods!= null){
@@ -507,7 +509,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                                 }
                                 JZDataSource dataSource = new JZDataSource(map, "");
-                                dataSource.looping = true;
                                 video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
                                 loadStep(mCurrGoods.getProduct_id());
@@ -567,7 +568,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                                 }
                                 JZDataSource dataSource = new JZDataSource(map, "");
-                                dataSource.looping = true;
                                 video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
 

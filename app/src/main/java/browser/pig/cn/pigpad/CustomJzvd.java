@@ -51,6 +51,11 @@ public class CustomJzvd extends JzvdStd {
 
             }
 
+        }else {
+            if(p >=99){
+                JZMediaManager.pause();
+                    changeUrl(jzDataSource.currentUrlIndex,1000);
+            }
         }
     }
     @Override
