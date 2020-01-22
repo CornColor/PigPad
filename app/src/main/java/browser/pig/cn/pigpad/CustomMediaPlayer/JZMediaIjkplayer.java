@@ -55,7 +55,7 @@ public class JZMediaIjkplayer extends JZMediaInterface implements IMediaPlayer.O
             ijkMediaPlayer.setDataSource(jzDataSource.getCurrentUrl().toString());
             ijkMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             ijkMediaPlayer.setScreenOnWhilePlaying(true);
-            ijkMediaPlayer.prepareAsync();
+            ijkMediaPlayer._prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
         }

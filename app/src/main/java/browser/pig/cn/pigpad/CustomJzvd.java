@@ -3,6 +3,7 @@ package browser.pig.cn.pigpad;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -57,16 +58,23 @@ public class CustomJzvd extends JzvdStd {
         Jzvd.NORMAL_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
     }
 
+    @Override
+    public void onStateAutoComplete() {
+        super.onStateAutoComplete();
+        Log.e("完结","onStateAutoComplete");
+    }
+
+    @Override
+    public void onCompletion() {
+        super.onCompletion();
+    }
 
     @Override
     public void onAutoCompletion() {
         super.onAutoCompletion();
         //播放下一集 在这里切换url
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
                 if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                    if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()){
+                    if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()-1){
                         int index = jzDataSource.currentUrlIndex+1;
                         changeUrl(index,0);
                     }else {
@@ -74,10 +82,10 @@ public class CustomJzvd extends JzvdStd {
                     }
 
                 }else {
-                    changeUrl(jzDataSource.currentUrlIndex,0);
+                        int index = jzDataSource.currentUrlIndex;
+                        changeUrl(index,0);
                 }
-            }
-        },500);
+
 
     }
 

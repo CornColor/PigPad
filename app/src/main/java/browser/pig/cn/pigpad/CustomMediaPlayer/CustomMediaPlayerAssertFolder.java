@@ -43,7 +43,7 @@ public class CustomMediaPlayerAssertFolder extends JZMediaInterface implements M
             AssetFileDescriptor assetFileDescriptor = (AssetFileDescriptor) jzDataSource.getCurrentUrl();
             mediaPlayer.setDataSource(assetFileDescriptor.getFileDescriptor(), assetFileDescriptor.getStartOffset(), assetFileDescriptor.getLength());
 
-            mediaPlayer.prepareAsync();
+            mediaPlayer.prepare();
         } catch (Exception e) {
             e.printStackTrace();
         }

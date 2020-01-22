@@ -1,5 +1,7 @@
 package cn.jzvd;
 
+import android.util.Log;
+
 /**
  * Put JZVideoPlayer into layout
  * From a JZVideoPlayer to another JZVideoPlayer

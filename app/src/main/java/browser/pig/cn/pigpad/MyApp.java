@@ -8,6 +8,7 @@ import android.support.multidex.MultiDex;
 import com.liulishuo.filedownloader.FileDownloader;
 
 import browser.pig.cn.pigpad.CustomMediaPlayer.CustomMediaPlayerAssertFolder;
+import browser.pig.cn.pigpad.CustomMediaPlayer.JZExoPlayer;
 import browser.pig.cn.pigpad.CustomMediaPlayer.JZMediaIjkplayer;
 import browser.pig.cn.pigpad.db.DbHelper;
 import cn.jzvd.JZMediaSystem;
@@ -25,13 +26,15 @@ public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        MultiDex.install(this);
         DbHelper.getInstance().init(this);
         FileDownloader.setup(this);
         //当sdk版本大于等于16更换播放引擎.
        // if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-      //      Jzvd.setMediaInterface(new JZExoPlayer());
+      //
       //  }
-       // Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
-        Jzvd.setMediaInterface(new JZMediaSystem());
+ //       Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
+    //    Jzvd.setMediaInterface(new JZMediaIjkplayer());
+        Jzvd.setMediaInterface(new JZExoPlayer());
     }
 }
