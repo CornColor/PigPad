@@ -103,11 +103,18 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
                 tvDownload.setTextColor(Color.parseColor("#61000000"));
                 AudioPlay.getInstance().stop();
-                if (video.currentState == CURRENT_STATE_PAUSE) {
-                    video.onEvent(JZUserAction.ON_CLICK_RESUME);
-                    JZMediaManager.start();
-                    video.onStatePlaying();
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (video.currentState == CURRENT_STATE_PAUSE) {
+                            video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                            JZMediaManager.start();
+                            video.onStatePlaying();
+                        }
+
+                    }
+                },500);
+
                 break;
             case R.id.tv_download:
                 rV.setVisibility(View.INVISIBLE);
@@ -116,11 +123,17 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 rV01.setVisibility(View.VISIBLE);
                 tvDownload.setBackgroundResource(R.drawable.shape_01);
                 tvDownload.setTextColor(Color.WHITE);
-                if (video.currentState == CURRENT_STATE_PLAYING) {
-                    video.onEvent(JZUserAction.ON_CLICK_PAUSE);
-                    JZMediaManager.pause();
-                    video.onStatePause();
-                }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (video.currentState == CURRENT_STATE_PLAYING) {
+                            video.onEvent(JZUserAction.ON_CLICK_PAUSE);
+                            JZMediaManager.pause();
+                            video.onStatePause();
+                        }
+
+                    }
+                },500);
 
                 break;
         }
@@ -306,7 +319,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     protected void onPause() {
         super.onPause();
         try {
-            JZMediaManager.pause();
+            Jzvd.clearSavedProgress(this, null);
+            Jzvd.goOnPlayOnPause();
         } catch (Exception e) {
 
         }
@@ -314,14 +328,18 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        if (Jzvd.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (JZMediaManager.getDataSource() != null) {
-            JZMediaManager.start();
-        }
+        Jzvd.goOnPlayOnResume();
         startTimer();
 
     }

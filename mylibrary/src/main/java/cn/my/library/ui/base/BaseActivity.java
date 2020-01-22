@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
@@ -51,7 +52,7 @@ import me.yokeyword.fragmentation.SupportActivity;
 
 import static android.view.View.GONE;
 
-public abstract class BaseActivity extends SupportActivity implements BaseView {
+public abstract class BaseActivity extends AppCompatActivity implements BaseView {
     //当被观察者被订阅会出现Disposable，用于存储Disposable当页面销毁的时候取消订阅
     private CompositeDisposable mCompositeDisposable;
     private List<BasePresenter> basePresenters;

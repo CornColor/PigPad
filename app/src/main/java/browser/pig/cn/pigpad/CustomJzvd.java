@@ -23,6 +23,7 @@ public class CustomJzvd extends JzvdStd {
         mContext = context;
     }
 
+
     public CustomJzvd(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
@@ -47,7 +48,7 @@ public class CustomJzvd extends JzvdStd {
 
     @Override
     public void onClick(View v) {
-        super.onClick(v);
+
         //设置控件单击事件
     }
     @Override
