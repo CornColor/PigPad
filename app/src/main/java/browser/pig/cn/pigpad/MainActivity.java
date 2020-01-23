@@ -615,39 +615,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     private void loadXinTiao() {
         if(!NetworkUtils.isConnected()){
-            List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
-            if(lgoods!= null){
-                list.addAll(lgoods);
-                if(list.size()>0){
-                    mCurrGoods = list.get(0);
-                    LinkedHashMap<String, String> map = new LinkedHashMap<>();
-                    if (list != null && list.size() > 0) {
-                        for (int i = 0; i < list.size(); i++) {
-                            //插入数据库
-                            if(!downLoadGoods(list.get(i))){
-                                map.put(list.get(i).getProduct_id(),
-                                        getLoctionPath(list.get(i)));
-                            }else {
-                                map.put(list.get(i).getProduct_id(),
-                                        list.get(i).getProduct_video());
-                            }
-
-
-                        }
-
-                    }
-                    JZDataSource dataSource = new JZDataSource(map, "");
-                    video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                    video.startVideo();
-                    loadStep(mCurrGoods.getProduct_id());
-                    video.startVideo();
-                    adapter.notifyDataSetChanged();
-                    adapter.setLine(0);
-                }
-
-
-            }
-
             return;
         }
         OkGo.<XGoodsListBean>post(XINTIAO)
@@ -708,7 +675,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void onGoods(GoodsBean goodsBean, int i) {
-
+        AudioPlay.getInstance().stop();
         mCurrGoods = goodsBean;
         tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
         video.changeUrl(i, 1000);
@@ -722,10 +689,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         rV01.setVisibility(View.GONE);
         tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
         tvDownload.setTextColor(Color.parseColor("#61000000"));
-
-        if (AudioPlay.getInstance().isPlay()) {
-            AudioPlay.getInstance().stop();
-        }
     }
 
     /**
@@ -789,27 +752,27 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
      */
     private void loadStep(String id) {
         if(!NetworkUtils.isConnected()){
-//            List<StepABean> list =   DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(id)).build().list();
-//            if(list!= null&&list.size()>0){
-//                List<Fragment> fragments = new ArrayList<>();
-//                for (int i = 0; i < list.size(); i++) {
-//                    DbHelper.getInstance().stepABeanLongDBManager().insert(list.get(i));
-//                    StepFragment stepFragment = new StepFragment();
-//                    Bundle bundle = new Bundle();
-//                    if(!downLoadStep(list.get(i))){
-//                        bundle.putString("audio",getLoctionPath(list.get(i)));
-//                    }else {
-//                        bundle.putString("audio", list.get(i).getStep_voice());
-//                    }
-//                    bundle.putString("bg", list.get(i).getStep_img());
-//                    stepFragment.setArguments(bundle);
-//                    fragments.add(stepFragment);
-//                }
-//                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
-//                vp.setAdapter(stepPageAdapter);
-//                vp.setCurrentItem(0);
-//                indicator.setViewPager(vp);
-//            }
+            List<StepABean> list =   DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(id)).build().list();
+            if(list!= null&&list.size()>0){
+                List<Fragment> fragments = new ArrayList<>();
+                for (int i = 0; i < list.size(); i++) {
+                    DbHelper.getInstance().stepABeanLongDBManager().insert(list.get(i));
+                    StepFragment stepFragment = new StepFragment();
+                    Bundle bundle = new Bundle();
+                    if(!downLoadStep(list.get(i))){
+                        bundle.putString("audio",getLoctionPath(list.get(i)));
+                    }else {
+                        bundle.putString("audio", list.get(i).getStep_voice());
+                    }
+                    bundle.putString("bg", list.get(i).getStep_img());
+                    stepFragment.setArguments(bundle);
+                    fragments.add(stepFragment);
+                }
+                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
+                vp.setAdapter(stepPageAdapter);
+                vp.setCurrentItem(0);
+                indicator.setViewPager(vp);
+            }
 
 
             return;
