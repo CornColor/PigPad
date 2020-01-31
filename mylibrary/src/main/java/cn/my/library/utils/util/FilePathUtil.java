@@ -18,11 +18,15 @@ public class FilePathUtil {
     public static String getFilePath(Context context, String dir){
         String directoryPath = "";
         //判断sd卡是否可用
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-            directoryPath = context.getExternalFilesDir(dir).getAbsolutePath();
-        }else {
-            directoryPath = context.getFilesDir()+ File.separator+dir;
-        }
+//        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+//            directoryPath = context.getExternalFilesDir(dir).getAbsolutePath();
+//        }else {
+//            directoryPath = context.getFilesDir()+ File.separator+dir;
+//        }
+       directoryPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"pigpad"+File.separator+dir;
         return directoryPath;
     }
+
+
+
 }

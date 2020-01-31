@@ -256,97 +256,97 @@ public class JzvdStd extends Jzvd {
         return super.onTouch(v, event);
     }
 
-    @Override
-    public void onClick(View v) {
-        super.onClick(v);
-        int i = v.getId();
-        if (i == R.id.thumb) {
-            if (jzDataSource.urlsMap.isEmpty() || jzDataSource.getCurrentUrl() == null) {
-                Toast.makeText(getContext(), getResources().getString(R.string.no_url), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (currentState == CURRENT_STATE_NORMAL) {
-                if (!jzDataSource.getCurrentUrl().toString().startsWith("file") &&
-                        !jzDataSource.getCurrentUrl().toString().startsWith("/") &&
-                        !JZUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
-                    showWifiDialog();
-                    return;
-                }
-                startVideo();
-                onEvent(JZUserActionStd.ON_CLICK_START_THUMB);//开始的事件应该在播放之后，此处特殊
-            } else if (currentState == CURRENT_STATE_AUTO_COMPLETE) {
-                onClickUiToggle();
-            }
-        } else if (i == R.id.surface_container) {
-            startDismissControlViewTimer();
-        } else if (i == R.id.back) {
-            backPress();
-        } else if (i == R.id.back_tiny) {
-            if (JzvdMgr.getFirstFloor().currentScreen == Jzvd.SCREEN_WINDOW_LIST) {
-                quitFullscreenOrTinyWindow();
-            } else {
-                backPress();
-            }
-        } else if (i == R.id.clarity) {
-            LayoutInflater inflater = (LayoutInflater) getContext()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.jz_layout_clarity, null);
-
-            OnClickListener mQualityListener = new OnClickListener() {
-                public void onClick(View v) {
-                    int index = (int) v.getTag();
-                    changeUrl(index, getCurrentPositionWhenPlaying());
-                    clarity.setText(jzDataSource.getCurrentKey().toString());
-                    for (int j = 0; j < layout.getChildCount(); j++) {//设置点击之后的颜色
-                        if (j == jzDataSource.currentUrlIndex) {
-                            ((TextView) layout.getChildAt(j)).setTextColor(Color.parseColor("#fff85959"));
-                        } else {
-                            ((TextView) layout.getChildAt(j)).setTextColor(Color.parseColor("#ffffff"));
-                        }
-                    }
-                    if (clarityPopWindow != null) {
-                        clarityPopWindow.dismiss();
-                    }
-                }
-            };
-
-            for (int j = 0; j < jzDataSource.urlsMap.size(); j++) {
-                String key = jzDataSource.getKeyFromDataSource(j);
-                TextView clarityItem = (TextView) View.inflate(getContext(), R.layout.jz_layout_clarity_item, null);
-                clarityItem.setText(key);
-                clarityItem.setTag(j);
-                layout.addView(clarityItem, j);
-                clarityItem.setOnClickListener(mQualityListener);
-                if (j == jzDataSource.currentUrlIndex) {
-                    clarityItem.setTextColor(Color.parseColor("#fff85959"));
-                }
-            }
-
-            clarityPopWindow = new PopupWindow(layout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
-            clarityPopWindow.setContentView(layout);
-            clarityPopWindow.showAsDropDown(clarity);
-            layout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            int offsetX = clarity.getMeasuredWidth() / 3;
-            int offsetY = clarity.getMeasuredHeight() / 3;
-            clarityPopWindow.update(clarity, -offsetX, -offsetY, Math.round(layout.getMeasuredWidth() * 2), layout.getMeasuredHeight());
-        } else if (i == R.id.retry_btn) {
-            if (jzDataSource.urlsMap.isEmpty() || jzDataSource.getCurrentUrl() == null) {
-                Toast.makeText(getContext(), getResources().getString(R.string.no_url), Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!jzDataSource.getCurrentUrl().toString().startsWith("file") && !
-                    jzDataSource.getCurrentUrl().toString().startsWith("/") &&
-                    !JZUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
-                showWifiDialog();
-                return;
-            }
-            initTextureView();//和开始播放的代码重复
-            addTextureView();
-            JZMediaManager.setDataSource(jzDataSource);
-            onStatePreparing();
-            onEvent(JZUserAction.ON_CLICK_START_ERROR);
-        }
-    }
+//    @Override
+//    public void onClick(View v) {
+//        super.onClick(v);
+//        int i = v.getId();
+//        if (i == R.id.thumb) {
+//            if (jzDataSource.urlsMap.isEmpty() || jzDataSource.getCurrentUrl() == null) {
+//                Toast.makeText(getContext(), getResources().getString(R.string.no_url), Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (currentState == CURRENT_STATE_NORMAL) {
+//                if (!jzDataSource.getCurrentUrl().toString().startsWith("file") &&
+//                        !jzDataSource.getCurrentUrl().toString().startsWith("/") &&
+//                        !JZUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
+//                    showWifiDialog();
+//                    return;
+//                }
+//                startVideo();
+//                onEvent(JZUserActionStd.ON_CLICK_START_THUMB);//开始的事件应该在播放之后，此处特殊
+//            } else if (currentState == CURRENT_STATE_AUTO_COMPLETE) {
+//                onClickUiToggle();
+//            }
+//        } else if (i == R.id.surface_container) {
+//            startDismissControlViewTimer();
+//        } else if (i == R.id.back) {
+//            backPress();
+//        } else if (i == R.id.back_tiny) {
+//            if (JzvdMgr.getFirstFloor().currentScreen == Jzvd.SCREEN_WINDOW_LIST) {
+//                quitFullscreenOrTinyWindow();
+//            } else {
+//                backPress();
+//            }
+//        } else if (i == R.id.clarity) {
+//            LayoutInflater inflater = (LayoutInflater) getContext()
+//                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            final LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.jz_layout_clarity, null);
+//
+//            OnClickListener mQualityListener = new OnClickListener() {
+//                public void onClick(View v) {
+//                    int index = (int) v.getTag();
+//                    changeUrl(index, getCurrentPositionWhenPlaying());
+//                    clarity.setText(jzDataSource.getCurrentKey().toString());
+//                    for (int j = 0; j < layout.getChildCount(); j++) {//设置点击之后的颜色
+//                        if (j == jzDataSource.currentUrlIndex) {
+//                            ((TextView) layout.getChildAt(j)).setTextColor(Color.parseColor("#fff85959"));
+//                        } else {
+//                            ((TextView) layout.getChildAt(j)).setTextColor(Color.parseColor("#ffffff"));
+//                        }
+//                    }
+//                    if (clarityPopWindow != null) {
+//                        clarityPopWindow.dismiss();
+//                    }
+//                }
+//            };
+//
+//            for (int j = 0; j < jzDataSource.urlsMap.size(); j++) {
+//                String key = jzDataSource.getKeyFromDataSource(j);
+//                TextView clarityItem = (TextView) View.inflate(getContext(), R.layout.jz_layout_clarity_item, null);
+//                clarityItem.setText(key);
+//                clarityItem.setTag(j);
+//                layout.addView(clarityItem, j);
+//                clarityItem.setOnClickListener(mQualityListener);
+//                if (j == jzDataSource.currentUrlIndex) {
+//                    clarityItem.setTextColor(Color.parseColor("#fff85959"));
+//                }
+//            }
+//
+//            clarityPopWindow = new PopupWindow(layout, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
+//            clarityPopWindow.setContentView(layout);
+//            clarityPopWindow.showAsDropDown(clarity);
+//            layout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//            int offsetX = clarity.getMeasuredWidth() / 3;
+//            int offsetY = clarity.getMeasuredHeight() / 3;
+//            clarityPopWindow.update(clarity, -offsetX, -offsetY, Math.round(layout.getMeasuredWidth() * 2), layout.getMeasuredHeight());
+//        } else if (i == R.id.retry_btn) {
+//            if (jzDataSource.urlsMap.isEmpty() || jzDataSource.getCurrentUrl() == null) {
+//                Toast.makeText(getContext(), getResources().getString(R.string.no_url), Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//            if (!jzDataSource.getCurrentUrl().toString().startsWith("file") && !
+//                    jzDataSource.getCurrentUrl().toString().startsWith("/") &&
+//                    !JZUtils.isWifiConnected(getContext()) && !WIFI_TIP_DIALOG_SHOWED) {
+//                showWifiDialog();
+//                return;
+//            }
+//            initTextureView();//和开始播放的代码重复
+//            addTextureView();
+//            JZMediaManager.setDataSource(jzDataSource);
+//            onStatePreparing();
+//            onEvent(JZUserAction.ON_CLICK_START_ERROR);
+//        }
+//    }
 
     @Override
     public void showWifiDialog() {
@@ -395,29 +395,29 @@ public class JzvdStd extends Jzvd {
     }
 
     public void onClickUiToggle() {
-        if (bottomContainer.getVisibility() != View.VISIBLE) {
-            setSystemTimeAndBattery();
-            clarity.setText(jzDataSource.getCurrentKey().toString());
-        }
-        if (currentState == CURRENT_STATE_PREPARING) {
-            changeUiToPreparing();
-            if (bottomContainer.getVisibility() == View.VISIBLE) {
-            } else {
-                setSystemTimeAndBattery();
-            }
-        } else if (currentState == CURRENT_STATE_PLAYING) {
-            if (bottomContainer.getVisibility() == View.VISIBLE) {
-                changeUiToPlayingClear();
-            } else {
-                changeUiToPlayingShow();
-            }
-        } else if (currentState == CURRENT_STATE_PAUSE) {
-            if (bottomContainer.getVisibility() == View.VISIBLE) {
-                changeUiToPauseClear();
-            } else {
-                changeUiToPauseShow();
-            }
-        }
+//        if (bottomContainer.getVisibility() != View.VISIBLE) {
+//            setSystemTimeAndBattery();
+//            clarity.setText(jzDataSource.getCurrentKey().toString());
+//        }
+//        if (currentState == CURRENT_STATE_PREPARING) {
+//            changeUiToPreparing();
+//            if (bottomContainer.getVisibility() == View.VISIBLE) {
+//            } else {
+//                setSystemTimeAndBattery();
+//            }
+//        } else if (currentState == CURRENT_STATE_PLAYING) {
+//            if (bottomContainer.getVisibility() == View.VISIBLE) {
+//                changeUiToPlayingClear();
+//            } else {
+//                changeUiToPlayingShow();
+//            }
+//        } else if (currentState == CURRENT_STATE_PAUSE) {
+//            if (bottomContainer.getVisibility() == View.VISIBLE) {
+//                changeUiToPauseClear();
+//            } else {
+//                changeUiToPauseShow();
+//            }
+//        }
     }
 
     public void setSystemTimeAndBattery() {

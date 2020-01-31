@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.PersistableBundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,12 +19,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloadQueueSet;
 import com.liulishuo.filedownloader.FileDownloader;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.Response;
+import com.lzy.okgo.request.base.Request;
 import com.yanzhenjie.permission.Permission;
 
 import java.io.File;
@@ -32,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import browser.pig.cn.pigpad.bean.GoodsBean;
 import browser.pig.cn.pigpad.bean.GoodsListBean;
@@ -76,6 +81,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     private RecyclerView rv_data;
     private GoodsAdapter adapter;
     private List<GoodsBean> list;
+    private ConstraintLayout title;
+
 
     //   private List<StepBean> list1;
 //    private StepAdapter stepAdapter;
@@ -91,10 +98,20 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     private Timer timer;
     private TimerTask task;
 
+    /**
+     * 心跳间隔时间
+     */
+    private float update_Interval = 1.0f;
+    private int downCount = 0;
+
+    private int fenzhong = 5;
+    private boolean isUpDate = false;
+    private int type = 0;
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_video:
+                type = 0;
                 rV.setVisibility(View.VISIBLE);
                 tvVideo.setBackgroundResource(R.drawable.shape_01);
                 tvVideo.setTextColor(Color.WHITE);
@@ -113,10 +130,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                         }
 
                     }
-                },500);
+                },1000);
 
                 break;
             case R.id.tv_download:
+                type = 1;
                 rV.setVisibility(View.INVISIBLE);
                 tvVideo.setBackgroundColor(Color.parseColor("#EEEEEE"));
                 tvVideo.setTextColor(Color.parseColor("#61000000"));
@@ -133,8 +151,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                         }
 
                     }
-                },500);
+                },1000);
 
+                break;
+            case R.id.title:
+                continuousClick(COUNTS, DURATION);
                 break;
         }
     }
@@ -147,11 +168,49 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //播放整体列表
-                    if (video.currentState == CURRENT_STATE_PLAYING) {
-                        video.startWindowFullscreen();
-                        video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
+                    if (video.currentState == CURRENT_STATE_PAUSE) {
+
+                        //播放整体列表
+                        video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                        JZMediaManager.start();
+                        video.onStatePlaying();
+                        rV.setVisibility(View.VISIBLE);
+                        tVideoName.setVisibility(View.INVISIBLE);
+
+                            new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                if(mCurrGoods!= null&&"1".equals(mCurrGoods.getIffullscreen())){
+                                    if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                                        video.startWindowFullscreen();
+                                        video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
+                                    }
+                                }else {
+                                    if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                                        video.startWindowFullscreen();
+                                        video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
+                                    }
+                                }
+
+                            }
+                        },1000);
+                    }else {
+                        //播放整体列表
+                        if(mCurrGoods!= null&&"1".equals(mCurrGoods.getIffullscreen())){
+                            if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                                video.startWindowFullscreen();
+                                video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
+                            }
+                        }else {
+                            if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                                video.startWindowFullscreen();
+                                video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
+                            }
+                        }
                     }
+
+
 
                 }
             });
@@ -162,25 +221,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
 
-
-//        list1 = new ArrayList<>();
-//        for (int i = 0; i < 4; i++) {
-//            StepBean goodsBean = new StepBean();
-//            list1.add(goodsBean);
-//        }
-        //   rvBz = findViewById(R.id.rv_bz);
-//        stepAdapter = new StepAdapter(this,list1);
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-//        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        rvBz.setLayoutManager(layoutManager);
-//        rvBz.setAdapter(stepAdapter);
-
-
-
-// optional
-        // adapter.registerAdapterDataObserver(indicator.getAdapterDataObserver());
     }
 
     private void initTimer() {
@@ -198,11 +241,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
          */
         initTimer();
         try {
-            timer.schedule(task, 10 * 1000);
+            timer.schedule(task, fenzhong*60 * 1000);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             initTimer();
-            timer.schedule(task, 10 * 1000);
+            timer.schedule(task, fenzhong*60 * 1000);
         }
     }
 
@@ -262,6 +305,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         tvVideo.setOnClickListener(this);
         tvDownload.setOnClickListener(this);
 
+        title = findViewById(R.id.title);
+        title.setOnClickListener(this);
+
 
 
     }
@@ -269,6 +315,26 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     public void onChangeX(int i) {
         if (i >= 0 && i < list.size()) {
             adapter.updata(i);
+        }
+        if(type == 1){
+            rV.setVisibility(View.INVISIBLE);
+            tVideoName.setVisibility(View.VISIBLE);
+            tvVideo.setBackgroundColor(Color.parseColor("#EEEEEE"));
+            tvVideo.setTextColor(Color.parseColor("#61000000"));
+            rV01.setVisibility(View.VISIBLE);
+            tvDownload.setBackgroundResource(R.drawable.shape_01);
+            tvDownload.setTextColor(Color.WHITE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (video.currentState == CURRENT_STATE_PLAYING) {
+                        video.onEvent(JZUserAction.ON_CLICK_PAUSE);
+                        JZMediaManager.pause();
+                        video.onStatePause();
+                    }
+
+                }
+            },1000);
         }
     }
     public void onChangeZ() {
@@ -287,10 +353,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 // 在此处添加执行的代码
                 loadXinTiao();
                 banben();
-                handler.postDelayed(this, 1 * 60 * 1000);// 50是延时时长
+                handler.postDelayed(this, (long) (update_Interval * 60 * 1000));// 50是延时时长
             }
         };
-        handler.postDelayed(runnable, 1 * 60 * 1000);// 打开定时器，执行操作
+        handler.postDelayed(runnable, (long) (update_Interval * 60 * 1000));// 打开定时器，执行操作
 
 
         // video.thumbImageView.setImageResource(R.drawable.applog);
@@ -330,9 +396,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void onBackPressed() {
-        if (Jzvd.backPress()) {
-            return;
-        }
+      //  if (Jzvd.backPress()) {
+        //    return;
+        //}
         super.onBackPressed();
     }
 
@@ -517,6 +583,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     }
 
+
+
     private void loadGoods() {
         if(!NetworkUtils.isConnected()){
             List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
@@ -524,6 +592,14 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 list.addAll(lgoods);
                 if(list.size()>0){
                     mCurrGoods = list.get(0);
+                    if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
+                        try{
+                            fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
+                        }catch (Exception e){
+                            fenzhong = 5;
+                        }
+
+                    }
                     LinkedHashMap<String, String> map = new LinkedHashMap<>();
                     if (list != null && list.size() > 0) {
                         for (int i = 0; i < list.size(); i++) {
@@ -542,8 +618,15 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     }
                     JZDataSource dataSource = new JZDataSource(map, "");
                     video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                    video.startVideo();
+                    if(!StringUtils.isEmpty(mCurrGoods.getCycleindex())){
+                        try {
+                            video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()));
+                        }catch (Exception e){
+
+                        }
+                    }
                     loadStep(mCurrGoods.getProduct_id());
+
                     video.startVideo();
                     adapter.notifyDataSetChanged();
                     adapter.setLine(0);
@@ -554,20 +637,76 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
             return;
         }
+        showProgressDialog("加载数据...");
         OkGo.<GoodsListBean>post(GOODS_LIST)
                 .execute(new CommonCallback<GoodsListBean>(GoodsListBean.class) {
+                    @Override
+                    public void onStart(Request<GoodsListBean, ? extends Request> request) {
+                        super.onStart(request);
+
+
+                    }
 
                     @Override
                     public void onFailure(String code, String s) {
+                        showToast("加载数据失败");
+                        cancelProgressDialog();
+
+                    }
+
+                    @Override
+                    public void onError(Response<GoodsListBean> response) {
+                        super.onError(response);
+                        cancelProgressDialog();
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        super.onFinish();
 
                     }
 
                     @Override
                     public void onSuccess(GoodsListBean goodsListBean) {
                         if (goodsListBean != null) {
+                            List<GoodsBean> goodsBeanList = goodsListBean.getData().getList();
+                            if(list!= null&&goodsBeanList!= null){
+                                for (int i = 0; i < list.size(); i++) {
+
+                                    boolean isC =false;
+                                    for (int j =0;j<goodsBeanList.size();j++){
+
+                                      if(list.get(i).getProduct_id().equals(goodsBeanList.get(j).getProduct_id())){
+                                          isC = true;
+                                      }
+
+                                    }
+                                    if(!isC){
+                                        if(FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                            FileUtils.delete(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id()));
+                                        }
+                                    }
+
+
+                                }
+
+                            }
+
+
+
                             list.clear();
                             if (goodsListBean.getData().getList() != null && goodsListBean.getData().getList().size() > 0) {
                                 mCurrGoods = goodsListBean.getData().getList().get(0);
+                                if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
+                                    try{
+                                        fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
+                                    }catch (Exception e){
+                                        fenzhong = 5;
+                                    }
+
+                                }
                                 mCurrGoods.setSelect(true);
                                 adapter.setLine(0);
                                 list.addAll(goodsListBean.getData().getList());
@@ -578,28 +717,67 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 //                                jzDataSource.looping = true;
 //                                video.setUp(jzDataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
-                                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+
                                 if (list != null && list.size() > 0) {
+                                    DbHelper.getInstance().stepABeanLongDBManager().deleteAll();
                                     for (int i = 0; i < list.size(); i++) {
-                                        //插入数据库
-                                        DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
-                                        if(!downLoadGoods(list.get(i))){
-                                            map.put(list.get(i).getProduct_id(),
-                                                    getLoctionPath(list.get(i)));
-                                        }else {
-                                            map.put(list.get(i).getProduct_id(),
-                                                    list.get(i).getProduct_video());
+                                        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                           downCount++;
                                         }
+                                        loadStepRe(list.get(i).getProduct_id());
 
 
                                     }
+                                    if(downCount>0){
+                                        for (int i = 0; i < list.size(); i++) {
+                                            if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                    + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                    FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                                zyFlieDownLoad(list.get(i).getProduct_video(),list.get(i).getProduct_id(),downloadListener);
+                                                showProgressDialog("正在下载（"+sum+"/"+downCount+"）");
+                                            }
+
+
+                                        }
+                                    }else {
+                                        cancelProgressDialog();
+                                        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                                        if (list != null && list.size() > 0) {
+                                            for (int i = 0; i < list.size(); i++) {
+                                                //插入数据库
+                                                DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
+                                                if(!downLoadGoods(list.get(i))){
+                                                    map.put(list.get(i).getProduct_id(),
+                                                            getLoctionPath(list.get(i)));
+                                                }else {
+                                                    map.put(list.get(i).getProduct_id(),
+                                                            list.get(i).getProduct_video());
+                                                }
+
+
+                                            }
+
+                                        }
+                                        JZDataSource dataSource = new JZDataSource(map, "");
+                                        video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
+                                        video.startVideo();
+                                        video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()==null?"0":mCurrGoods.getCycleindex()));
+                                        loadStep(mCurrGoods.getProduct_id());
+                                        video.startVideo();
+
+
+                                        adapter.notifyDataSetChanged();
+                                        sum = 0;
+                                        downCount = 0;
+                                    }
+
 
                                 }
-                                JZDataSource dataSource = new JZDataSource(map, "");
-                                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                                video.startVideo();
-                                loadStep(mCurrGoods.getProduct_id());
-                                video.startVideo();
+
+
+
 
 
                             }
@@ -617,66 +795,271 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(!NetworkUtils.isConnected()){
             return;
         }
-        OkGo.<XGoodsListBean>post(XINTIAO)
-                .params("device_id", DeviceUtils.getAndroidID())
-                .execute(new CommonCallback<XGoodsListBean>(XGoodsListBean.class) {
+        rV.setVisibility(View.VISIBLE);
+        tvVideo.setBackgroundResource(R.drawable.shape_01);
+        tvVideo.setTextColor(Color.WHITE);
 
-                    @Override
-                    public void onFailure(String code, String s) {
+        rV01.setVisibility(View.INVISIBLE);
+        tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
+        tvDownload.setTextColor(Color.parseColor("#61000000"));
+        AudioPlay.getInstance().stop();
 
-                    }
 
-                    @Override
-                    public void onSuccess(XGoodsListBean goodsListBean) {
-                        if (goodsListBean != null && goodsListBean.getData().getUpdatecode() == 1) {
-                            list.clear();
-                            if (goodsListBean.getData().getProducts() != null && goodsListBean.getData().getProducts().size() > 0) {
-                                mCurrGoods = goodsListBean.getData().getProducts().get(0);
-                                list.addAll(goodsListBean.getData().getProducts());
-                                if (video.currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                                    Jzvd.backPress();
-                                }
-                                adapter.setLine(0);
-                                JZMediaManager.pause();
-                                LinkedHashMap<String, String> map = new LinkedHashMap<>();
-                                DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
-                                if (list != null && list.size() > 0) {
-                                    for (int i = 0; i < list.size(); i++) {
-                                        DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
-                                        if(!downLoadGoods(list.get(i))){
-                                            map.put(list.get(i).getProduct_id(),
-                                                    getLoctionPath(list.get(i)));
-                                        }else {
-                                            map.put(list.get(i).getProduct_id(),
-                                                    list.get(i).getProduct_video());
+                if (video.currentState == CURRENT_STATE_PLAYING) {
+                    video.onEvent(JZUserAction.ON_CLICK_PAUSE);
+                    JZMediaManager.pause();
+                    video.onStatePause();
+
+                }
+                Jzvd.backPress();
+
+
+
+        showProgressDialog("更新数据...");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                OkGo.<XGoodsListBean>post(XINTIAO)
+                        .params("device_id", DeviceUtils.getAndroidID())
+                        .execute(new CommonCallback<XGoodsListBean>(XGoodsListBean.class) {
+                            @Override
+                            public void onStart(Request<XGoodsListBean, ? extends Request> request) {
+                                super.onStart(request);
+
+                                isUpDate = true;
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                super.onFinish();
+                                isUpDate = false;
+
+                            }
+
+                            @Override
+                            public void onFailure(String code, String s) {
+                                cancelProgressDialog();
+                                showToast(s);
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (video.currentState == CURRENT_STATE_PAUSE) {
+                                            video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                                            JZMediaManager.start();
+                                            video.onStatePlaying();
+                                        }
+
+                                    }
+                                },1000);
+                            }
+
+                            @Override
+                            public void onError(Response<XGoodsListBean> response) {
+                                super.onError(response);
+                                cancelProgressDialog();
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (video.currentState == CURRENT_STATE_PAUSE) {
+                                            video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                                            JZMediaManager.start();
+                                            video.onStatePlaying();
+                                        }
+
+                                    }
+                                },1000);
+                            }
+
+                            @Override
+                            public void onSuccess(XGoodsListBean goodsListBean) {
+
+
+
+                                if (goodsListBean != null && goodsListBean.getData().getUpdatecode() == 1) {
+
+                                    List<GoodsBean> goodsBeanList = goodsListBean.getData().getProducts();
+                                    if(list!= null&&goodsBeanList!= null){
+                                        for (int i = 0; i < list.size(); i++) {
+
+                                            boolean isC =false;
+                                            for (int j =0;j<goodsBeanList.size();j++){
+
+                                                if(list.get(i).getProduct_id().equals(goodsBeanList.get(j).getProduct_id())){
+                                                    isC = true;
+                                                }
+
+                                            }
+                                            if(!isC){
+                                                if(FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                        + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                        FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                                    FileUtils.delete(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id()));
+                                                }
+                                            }
+
+
                                         }
 
                                     }
 
-                                }
-                                JZDataSource dataSource = new JZDataSource(map, "");
-                                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                                video.startVideo();
 
-                                for (int i = 0; i < goodsListBean.getData().getProducts().size(); i++) {
-                                    updata(goodsListBean.getData().getProducts().get(i).getProduct_id());
+
+                                    if(goodsListBean.getData().getProducts()==null||goodsListBean.getData().getProducts().size()<=0){
+                                         cancelProgressDialog();
+                                        showToast("无新数据");
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                if (video.currentState == CURRENT_STATE_PAUSE) {
+                                                    video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                                                    JZMediaManager.start();
+                                                    video.onStatePlaying();
+                                                }
+
+                                            }
+                                        },1000);
+                                        return;
+                                    }
+                                    list.clear();
+                                    try {
+                                        update_Interval = Float.valueOf(goodsListBean.getData().getUpdate_Interval());
+
+                                    }catch (Exception e){
+                                        update_Interval = 1.0f;
+                                    }
+
+                                    if (goodsListBean.getData().getProducts() != null && goodsListBean.getData().getProducts().size() > 0) {
+                                        mCurrGoods = goodsListBean.getData().getProducts().get(0);
+                                        if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
+                                            try{
+                                                fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
+                                            }catch (Exception e){
+                                                fenzhong = 5;
+                                            }
+
+                                        }
+                                        list.addAll(goodsListBean.getData().getProducts());
+                                        if (video.currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+                                            Jzvd.backPress();
+                                        }
+                                        adapter.setLine(0);
+
+
+                                        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                                        DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
+
+
+                                        if (list != null && list.size() > 0) {
+                                            DbHelper.getInstance().stepABeanLongDBManager().deleteAll();
+
+                                            for (int i = 0; i < list.size(); i++) {
+                                                loadStepRe(list.get(i).getProduct_id());
+
+                                                if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                        + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                        FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                                    downCount++;
+                                                }
+
+
+                                            }
+                                            if(downCount>0){
+                                                for (int i = 0; i < list.size(); i++) {
+                                                    if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                            + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                            FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                                        zyFlieDownLoad(list.get(i).getProduct_video(),list.get(i).getProduct_id(),downloadListener);
+                                                        showProgressDialog("正在下载（"+sum+"/"+downCount+"）");
+                                                    }
+
+
+                                                }
+                                            }else {
+                                                cancelProgressDialog();
+                                                if (list != null && list.size() > 0) {
+                                                    for (int i = 0; i < list.size(); i++) {
+                                                        //插入数据库
+                                                        DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
+                                                        if(!downLoadGoods(list.get(i))){
+                                                            map.put(list.get(i).getProduct_id(),
+                                                                    getLoctionPath(list.get(i)));
+                                                        }else {
+                                                            map.put(list.get(i).getProduct_id(),
+                                                                    list.get(i).getProduct_video());
+                                                        }
+
+
+                                                    }
+
+                                                }
+                                                JZDataSource dataSource = new JZDataSource(map, "");
+                                                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
+                                                video.startVideo();
+                                                video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()==null?"0":mCurrGoods.getCycleindex()));
+                                                loadStep(mCurrGoods.getProduct_id());
+
+                                                video.startVideo();
+
+                                                adapter.notifyDataSetChanged();
+                                                sum = 0;
+                                                downCount = 0;
+                                            }
+
+
+
+                                        }
+
+
+
+
+
+
+                                        for (int i = 0; i < goodsListBean.getData().getProducts().size(); i++) {
+                                            updata(goodsListBean.getData().getProducts().get(i).getProduct_id());
+                                        }
+
+                                    }
+
+                                    adapter.notifyDataSetChanged();
+
+
+                                }else {
+                                    cancelProgressDialog();
+
+                                    showToast("无新数据");
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (video.currentState == CURRENT_STATE_PAUSE) {
+                                                video.onEvent(JZUserAction.ON_CLICK_RESUME);
+                                                JZMediaManager.start();
+                                                video.onStatePlaying();
+                                            }
+
+                                        }
+                                    },1000);
                                 }
 
                             }
+                        });
+            }
+        },2000);
 
-                            adapter.notifyDataSetChanged();
-
-
-                        }
-
-                    }
-                });
     }
 
     @Override
     public void onGoods(GoodsBean goodsBean, int i) {
         AudioPlay.getInstance().stop();
         mCurrGoods = goodsBean;
+        if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
+            try{
+                fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
+            }catch (Exception e){
+                fenzhong = 5;
+            }
+
+        }
         tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
         video.changeUrl(i, 1000);
         loadStep(mCurrGoods.getProduct_id());
@@ -690,13 +1073,84 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         tvDownload.setBackgroundColor(Color.parseColor("#EEEEEE"));
         tvDownload.setTextColor(Color.parseColor("#61000000"));
     }
+    int sum = 0;
+
+    FileDownloadListener downloadListener = new FileDownloadListener() {
+        @Override
+        protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+        }
+
+        @Override
+        protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+        }
+
+        @Override
+        protected void completed(BaseDownloadTask task) {
+
+        sum++;
+        if(sum == downCount&&FileDownloader.getImpl().isServiceConnected()){
+            cancelProgressDialog();
+            LinkedHashMap<String, String> map = new LinkedHashMap<>();
+            if (list != null && list.size() > 0) {
+                for (int i = 0; i < list.size(); i++) {
+                    //插入数据库
+                    DbHelper.getInstance().goodsBeanLongDBManager().insert(list.get(i));
+                    if(!downLoadGoods(list.get(i))){
+                        map.put(list.get(i).getProduct_id(),
+                                getLoctionPath(list.get(i)));
+                    }else {
+                        map.put(list.get(i).getProduct_id(),
+                                list.get(i).getProduct_video());
+                    }
+
+
+                }
+
+            }
+            JZDataSource dataSource = new JZDataSource(map, "");
+            video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
+            video.startVideo();
+            video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()==null?"0":mCurrGoods.getCycleindex()));
+            loadStep(mCurrGoods.getProduct_id());
+            video.startVideo();
+
+            adapter.notifyDataSetChanged();
+            sum = 0;
+            downCount = 0;
+
+
+        }else {
+            if(downCount>0){
+                showProgressDialog("正在下载（"+sum+"/"+downCount+"）");
+
+            }
+        }
+        }
+
+        @Override
+        protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+        }
+
+        @Override
+        protected void error(BaseDownloadTask task, Throwable e) {
+
+        }
+
+        @Override
+        protected void warn(BaseDownloadTask task) {
+
+        }
+    };
 
     /**
      * 下载文件
      * @param path
      * @param id
      */
-    private void zyFlieDownLoad(String path,String id){
+    private void zyFlieDownLoad(String path,String id,FileDownloadListener downloadListener){
         if(!NetworkUtils.isConnected()){
             return;
         }
@@ -710,8 +1164,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
             FileDownloader.getImpl().create(path)
                     .setTag(path)
                     .setCallbackProgressTimes(0)
+                    .setAutoRetryTimes(10)
                     .setPath(location)
+                    .setListener(downloadListener)
                     .start();
+
         }
     }
 
@@ -719,7 +1176,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     private boolean downLoadGoods(GoodsBean goodsBean){
         if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
                 + File.separator + FileUtils.getFileNameByUrl(goodsBean.getProduct_video())  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video())))){
-            zyFlieDownLoad(goodsBean.getProduct_video(),goodsBean.getProduct_id());
+            zyFlieDownLoad(goodsBean.getProduct_video(),goodsBean.getProduct_id(),downloadListener);
             return true;
         }
         return false;
@@ -727,9 +1184,39 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
     private boolean downLoadStep(StepABean goodsBean){
-        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getStep_id())
+        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
                 + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice())))){
-            zyFlieDownLoad(goodsBean.getStep_voice(),goodsBean.getStep_id());
+            zyFlieDownLoad(goodsBean.getStep_voice(), goodsBean.getProduct_id(), new FileDownloadListener() {
+                @Override
+                protected void pending(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                }
+
+                @Override
+                protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                }
+
+                @Override
+                protected void completed(BaseDownloadTask task) {
+
+                }
+
+                @Override
+                protected void paused(BaseDownloadTask task, int soFarBytes, int totalBytes) {
+
+                }
+
+                @Override
+                protected void error(BaseDownloadTask task, Throwable e) {
+
+                }
+
+                @Override
+                protected void warn(BaseDownloadTask task) {
+
+                }
+            });
             return true;
         }
         return false;
@@ -740,7 +1227,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     public String getLoctionPath(StepABean goodsBean){
-        return FilePathUtil.getFilePath(this, goodsBean.getStep_id())
+        return FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
                 + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice());
     }
 
@@ -754,8 +1241,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(!NetworkUtils.isConnected()){
             List<StepABean> list =   DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(id)).build().list();
             if(list!= null&&list.size()>0){
+                Log.e("数据i",list.size()+"");
                 List<Fragment> fragments = new ArrayList<>();
                 for (int i = 0; i < list.size(); i++) {
+
                     DbHelper.getInstance().stepABeanLongDBManager().insert(list.get(i));
                     StepFragment stepFragment = new StepFragment();
                     Bundle bundle = new Bundle();
@@ -772,6 +1261,13 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 vp.setAdapter(stepPageAdapter);
                 vp.setCurrentItem(0);
                 indicator.setViewPager(vp);
+            }else {
+                List<Fragment> fragments = new ArrayList<>();
+                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
+                vp.setAdapter(stepPageAdapter);
+                vp.setCurrentItem(0);
+                indicator.setViewPager(vp);
+
             }
 
 
@@ -819,23 +1315,82 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 });
     }
 
+    /**
+     * 加载步骤
+     *
+     * @param id
+     */
+    private void loadStepRe(String id) {
+        OkGo.<StepBean>post(GOODS_STEP)
+                .params("product_id", id)
+                .execute(new CommonCallback<StepBean>(StepBean.class) {
 
+                    @Override
+                    public void onFailure(String code, String s) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(final StepBean goodsListBean) {
+                        if (goodsListBean != null) {
+
+                                for (int i = 0; i < goodsListBean.getData().getList().size(); i++) {
+                                    Log.e("写入",goodsListBean.getData().getList().toString()+"");
+                                List<StepABean> aBeans =   DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Step_id.eq(goodsListBean.getData().getList().get(i).getStep_id())).build().list();
+                                if(aBeans== null||aBeans.size()<=0){
+                                    DbHelper.getInstance().stepABeanLongDBManager().insert(goodsListBean.getData().getList().get(i));
+                                }
+
+                                    downLoadStep(goodsListBean.getData().getList().get(i));
+                                loadImg(goodsListBean.getData().getList().get(i).getStep_img());
+
+
+
+
+
+                                }
+
+
+                        }
+
+                    }
+                });
+    }
     final static int COUNTS = 5;// 点击次数
     final static long DURATION = 5000;// 规定有效时间
     long[] mHits = new long[COUNTS];
-    @OnClick(R.id.title)
-    public void onViewClicked() {
-        continuousClick(COUNTS, DURATION);
 
+    private void loadImg(final String img){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    Glide.with(MainActivity.this)
+                            .load(img)
+                            .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                            .get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
     }
+
     private void continuousClick(int count, long time) {
+
+        if(!NetworkUtils.isConnected()){
+            return;
+        }
         //每次点击时，数组向前移动一位
         System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
         //为数组最后一位赋值
         mHits[mHits.length - 1] = SystemClock.uptimeMillis();
         if (mHits[0] >= (SystemClock.uptimeMillis() - DURATION)) {
             mHits = new long[COUNTS];//重新初始化数组
-            Toast.makeText(this, "心跳", Toast.LENGTH_LONG).show();
             loadXinTiao();
         }
     }

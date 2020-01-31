@@ -124,16 +124,16 @@ public class JZMediaIjkplayer extends JZMediaInterface implements IMediaPlayer.O
 
     @Override
     public void onVideoSizeChanged(IMediaPlayer iMediaPlayer, int i, int i1, int i2, int i3) {
-        JZMediaManager.instance().currentVideoWidth = iMediaPlayer.getVideoWidth();
-        JZMediaManager.instance().currentVideoHeight = iMediaPlayer.getVideoHeight();
-        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (JzvdMgr.getCurrentJzvd() != null) {
-                    JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
-                }
-            }
-        });
+//        JZMediaManager.instance().currentVideoWidth = iMediaPlayer.getVideoWidth();
+//        JZMediaManager.instance().currentVideoHeight = iMediaPlayer.getVideoHeight();
+//        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (JzvdMgr.getCurrentJzvd() != null) {
+//                    JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
+//                }
+//            }
+//        });
     }
 
     @Override

@@ -23,6 +23,15 @@ public class XGoodsListBean extends BaseBean {
     public static class DataBean{
         private List<GoodsBean> products;
         private int updatecode;
+        private String update_Interval;
+
+        public String getUpdate_Interval() {
+            return update_Interval;
+        }
+
+        public void setUpdate_Interval(String update_Interval) {
+            this.update_Interval = update_Interval;
+        }
 
         public List<GoodsBean> getProducts() {
             return products;

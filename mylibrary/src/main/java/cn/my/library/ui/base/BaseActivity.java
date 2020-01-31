@@ -185,6 +185,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
         }
         if(dialog!= null){
             dialog.cancel();
+            dialog = null;
         }
     }
 
@@ -203,10 +204,17 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
         if(isDeath()){
             return;
         }
-        dialog = new SweetAlertDialog(this,SweetAlertDialog.PROGRESS_TYPE)
+        if(dialog== null){
 
-                .setTitleText(msg);
-        dialog.show();
+            dialog = new SweetAlertDialog(this,SweetAlertDialog.PROGRESS_TYPE)
+                    .setTitleText(msg);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.setCancelable(false);
+            dialog.show();
+        }else {
+            dialog.setTitleText(msg);
+        }
+
 //        if (msg != null || !"".equals(msg)) {
 //            ProgressDialog dialog;
 //            dialog = ProgressDialog.show(this,"",msg);

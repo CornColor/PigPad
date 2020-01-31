@@ -18,16 +18,24 @@ public class GoodsBean {
     private String product_icon;
     private boolean isSelect = false;
     private boolean isHidLine = false;
+    private String iffullscreen;
+    private String fullscreen_Interval;
+    private String cycleindex;
 
 
 
 
 
 
-    @Generated(hash = 925826455)
+
+
+
+
+    @Generated(hash = 1825307648)
     public GoodsBean(Long id, String product_id, String product_name,
             String product_video, String remarks, String product_icon,
-            boolean isSelect, boolean isHidLine) {
+            boolean isSelect, boolean isHidLine, String iffullscreen,
+            String fullscreen_Interval, String cycleindex) {
         this.id = id;
         this.product_id = product_id;
         this.product_name = product_name;
@@ -36,11 +44,18 @@ public class GoodsBean {
         this.product_icon = product_icon;
         this.isSelect = isSelect;
         this.isHidLine = isHidLine;
+        this.iffullscreen = iffullscreen;
+        this.fullscreen_Interval = fullscreen_Interval;
+        this.cycleindex = cycleindex;
     }
 
     @Generated(hash = 1806305570)
     public GoodsBean() {
     }
+
+
+
+
 
 
 
@@ -125,5 +140,46 @@ public class GoodsBean {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCycleindex() {
+        return this.cycleindex;
+    }
+
+    public void setCycleindex(String cycleindex) {
+        this.cycleindex = cycleindex;
+    }
+
+    public String getFullscreen_Interval() {
+        return this.fullscreen_Interval;
+    }
+
+    public void setFullscreen_Interval(String fullscreen_Interval) {
+        this.fullscreen_Interval = fullscreen_Interval;
+    }
+
+    public String getIffullscreen() {
+        return this.iffullscreen;
+    }
+
+    public void setIffullscreen(String iffullscreen) {
+        this.iffullscreen = iffullscreen;
+    }
+
+    @Override
+    public String toString() {
+        return "GoodsBean{" +
+                "id=" + id +
+                ", product_id='" + product_id + '\'' +
+                ", product_name='" + product_name + '\'' +
+                ", product_video='" + product_video + '\'' +
+                ", remarks='" + remarks + '\'' +
+                ", product_icon='" + product_icon + '\'' +
+                ", isSelect=" + isSelect +
+                ", isHidLine=" + isHidLine +
+                ", iffullscreen='" + iffullscreen + '\'' +
+                ", fullscreen_Interval='" + fullscreen_Interval + '\'' +
+                ", cycleindex='" + cycleindex + '\'' +
+                '}';
     }
 }

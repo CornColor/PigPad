@@ -17,7 +17,8 @@ import cn.jzvd.JzvdStd;
  */
 public class CustomJzvd extends JzvdStd {
     Context mContext;
-
+    //循环次数
+    private int count = -1;
     public CustomJzvd(Context context) {
         super(context);
         mContext = context;
@@ -59,6 +60,10 @@ public class CustomJzvd extends JzvdStd {
         Jzvd.NORMAL_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
     }
 
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     @Override
     public void onStateAutoComplete() {
         super.onStateAutoComplete();
@@ -75,12 +80,19 @@ public class CustomJzvd extends JzvdStd {
         super.onAutoCompletion();
         //播放下一集 在这里切换url
                 if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                    if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()-1){
-                        int index = jzDataSource.currentUrlIndex+1;
-                        changeUrl(index,0);
+                    if(count <= 0){
+                        if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()-1){
+                            int index = jzDataSource.currentUrlIndex+1;
+                            changeUrl(index,0);
+                        }else {
+                            changeUrl(0,0);
+                        }
                     }else {
-                        changeUrl(0,0);
+                        count--;
+                        int index = jzDataSource.currentUrlIndex;
+                        changeUrl(index,0);
                     }
+
 
                 }else {
                         int index = jzDataSource.currentUrlIndex;

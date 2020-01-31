@@ -29,12 +29,13 @@ public class MyApp extends Application {
         MultiDex.install(this);
         DbHelper.getInstance().init(this);
         FileDownloader.setup(this);
+        FileDownloader.enableAvoidDropFrame();
         //当sdk版本大于等于16更换播放引擎.
-       // if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
-      //
-      //  }
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+//            Jzvd.setMediaInterface(new JZExoPlayer());
+//        }
  //       Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
-    //    Jzvd.setMediaInterface(new JZMediaIjkplayer());
-        Jzvd.setMediaInterface(new JZExoPlayer());
+        Jzvd.setMediaInterface(new JZMediaIjkplayer());
+
     }
 }

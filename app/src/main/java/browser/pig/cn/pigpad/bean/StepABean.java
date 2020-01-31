@@ -122,4 +122,20 @@ public  class StepABean{
     public void setId(Long id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return "StepABean{" +
+                "id=" + id +
+                ", step_id='" + step_id + '\'' +
+                ", product_id='" + product_id + '\'' +
+                ", step_num='" + step_num + '\'' +
+                ", step_text='" + step_text + '\'' +
+                ", step_img='" + step_img + '\'' +
+                ", step_voice='" + step_voice + '\'' +
+                ", product_name='" + product_name + '\'' +
+                ", product_video='" + product_video + '\'' +
+                ", remarks='" + remarks + '\'' +
+                '}';
+    }
 }

@@ -32,6 +32,9 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         public final static Property Product_icon = new Property(5, String.class, "product_icon", false, "PRODUCT_ICON");
         public final static Property IsSelect = new Property(6, boolean.class, "isSelect", false, "IS_SELECT");
         public final static Property IsHidLine = new Property(7, boolean.class, "isHidLine", false, "IS_HID_LINE");
+        public final static Property Iffullscreen = new Property(8, String.class, "iffullscreen", false, "IFFULLSCREEN");
+        public final static Property Fullscreen_Interval = new Property(9, String.class, "fullscreen_Interval", false, "FULLSCREEN__INTERVAL");
+        public final static Property Cycleindex = new Property(10, String.class, "cycleindex", false, "CYCLEINDEX");
     };
 
 
@@ -54,7 +57,10 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
                 "\"REMARKS\" TEXT," + // 4: remarks
                 "\"PRODUCT_ICON\" TEXT," + // 5: product_icon
                 "\"IS_SELECT\" INTEGER NOT NULL ," + // 6: isSelect
-                "\"IS_HID_LINE\" INTEGER NOT NULL );"); // 7: isHidLine
+                "\"IS_HID_LINE\" INTEGER NOT NULL ," + // 7: isHidLine
+                "\"IFFULLSCREEN\" TEXT," + // 8: iffullscreen
+                "\"FULLSCREEN__INTERVAL\" TEXT," + // 9: fullscreen_Interval
+                "\"CYCLEINDEX\" TEXT);"); // 10: cycleindex
     }
 
     /** Drops the underlying database table. */
@@ -98,6 +104,21 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         }
         stmt.bindLong(7, entity.getIsSelect() ? 1L: 0L);
         stmt.bindLong(8, entity.getIsHidLine() ? 1L: 0L);
+ 
+        String iffullscreen = entity.getIffullscreen();
+        if (iffullscreen != null) {
+            stmt.bindString(9, iffullscreen);
+        }
+ 
+        String fullscreen_Interval = entity.getFullscreen_Interval();
+        if (fullscreen_Interval != null) {
+            stmt.bindString(10, fullscreen_Interval);
+        }
+ 
+        String cycleindex = entity.getCycleindex();
+        if (cycleindex != null) {
+            stmt.bindString(11, cycleindex);
+        }
     }
 
     @Override
@@ -135,6 +156,21 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         }
         stmt.bindLong(7, entity.getIsSelect() ? 1L: 0L);
         stmt.bindLong(8, entity.getIsHidLine() ? 1L: 0L);
+ 
+        String iffullscreen = entity.getIffullscreen();
+        if (iffullscreen != null) {
+            stmt.bindString(9, iffullscreen);
+        }
+ 
+        String fullscreen_Interval = entity.getFullscreen_Interval();
+        if (fullscreen_Interval != null) {
+            stmt.bindString(10, fullscreen_Interval);
+        }
+ 
+        String cycleindex = entity.getCycleindex();
+        if (cycleindex != null) {
+            stmt.bindString(11, cycleindex);
+        }
     }
 
     @Override
@@ -152,7 +188,10 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // remarks
             cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // product_icon
             cursor.getShort(offset + 6) != 0, // isSelect
-            cursor.getShort(offset + 7) != 0 // isHidLine
+            cursor.getShort(offset + 7) != 0, // isHidLine
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // iffullscreen
+            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // fullscreen_Interval
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // cycleindex
         );
         return entity;
     }
@@ -167,6 +206,9 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         entity.setProduct_icon(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
         entity.setIsSelect(cursor.getShort(offset + 6) != 0);
         entity.setIsHidLine(cursor.getShort(offset + 7) != 0);
+        entity.setIffullscreen(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
+        entity.setFullscreen_Interval(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
+        entity.setCycleindex(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
      }
     
     @Override
