@@ -25,4 +25,5 @@ public class StepPageAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return fragments.size();
     }
+
 }

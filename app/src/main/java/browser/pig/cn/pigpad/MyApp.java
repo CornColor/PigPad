@@ -35,7 +35,7 @@ public class MyApp extends Application {
 //            Jzvd.setMediaInterface(new JZExoPlayer());
 //        }
  //       Jzvd.setMediaInterface(new CustomMediaPlayerAssertFolder());
-        Jzvd.setMediaInterface(new JZMediaIjkplayer());
+     //   Jzvd.setMediaInterface(new JZMediaIjkplayer());
 
     }
 }

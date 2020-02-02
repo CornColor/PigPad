@@ -38,6 +38,20 @@ public  class StepABean{
         this.remarks = remarks;
     }
 
+    public StepABean(String step_id, String product_id, String step_num,
+                     String step_text, String step_img, String step_voice,
+                     String product_name, String product_video, String remarks) {
+        this.id = id;
+        this.step_id = step_id;
+        this.product_id = product_id;
+        this.step_num = step_num;
+        this.step_text = step_text;
+        this.step_img = step_img;
+        this.step_voice = step_voice;
+        this.product_name = product_name;
+        this.product_video = product_video;
+        this.remarks = remarks;
+    }
     @Generated(hash = 365243608)
     public StepABean() {
     }

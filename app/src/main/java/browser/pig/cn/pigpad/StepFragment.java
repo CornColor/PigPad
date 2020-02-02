@@ -18,6 +18,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import cn.my.library.utils.util.CommonUtil;
 import cn.my.library.utils.util.StringUtils;
 
@@ -41,7 +44,39 @@ public class StepFragment extends Fragment{
         Bundle bundle = getArguments();
         audio =  bundle.getString("audio");
         bg = bundle.getString("bg");
+        EventBus.getDefault().register(this);
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(audioPlayView!= null)
+            audioPlayView.stop();
+
+    }
+
+    @Subscribe
+    public void onBusEvent(MessageBus messageBus){
+        if(messageBus.getType() == 1){
+            if(audioPlayView!= null)
+                audioPlayView.stop();
+        }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(hidden){
+            if(audioPlayView!= null)
+            audioPlayView.stop();
+        }
     }
 
     @Nullable
@@ -76,6 +111,7 @@ public class StepFragment extends Fragment{
         });
         return view;
     }
+
 
     @Override
     public void onDestroy() {

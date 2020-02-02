@@ -121,10 +121,9 @@
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="13sp"
+        android:textSize="10sp"
         android:textColor="#575757"
         android:layout_marginTop="10dp"
-        android:singleLine="true"
         android:text="@string/dialog_default_title" />
 
     <TextView
@@ -132,7 +131,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="10sp"
         android:textAlignment="center"
         android:gravity="center"
         android:textColor="#797979"

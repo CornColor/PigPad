@@ -22,6 +22,7 @@ public class GoodsBean {
     private String fullscreen_Interval;
     private String cycleindex;
 
+    private String product_updatecode;
 
 
 
@@ -31,11 +32,13 @@ public class GoodsBean {
 
 
 
-    @Generated(hash = 1825307648)
+
+
+    @Generated(hash = 2009371284)
     public GoodsBean(Long id, String product_id, String product_name,
             String product_video, String remarks, String product_icon,
             boolean isSelect, boolean isHidLine, String iffullscreen,
-            String fullscreen_Interval, String cycleindex) {
+            String fullscreen_Interval, String cycleindex, String product_updatecode) {
         this.id = id;
         this.product_id = product_id;
         this.product_name = product_name;
@@ -47,12 +50,27 @@ public class GoodsBean {
         this.iffullscreen = iffullscreen;
         this.fullscreen_Interval = fullscreen_Interval;
         this.cycleindex = cycleindex;
+        this.product_updatecode = product_updatecode;
     }
 
     @Generated(hash = 1806305570)
     public GoodsBean() {
     }
 
+    public GoodsBean(String product_id, String product_name,
+                     String product_video, String remarks, String product_icon,
+                     String iffullscreen,
+                     String fullscreen_Interval, String cycleindex, String product_updatecode) {
+        this.product_id = product_id;
+        this.product_name = product_name;
+        this.product_video = product_video;
+        this.remarks = remarks;
+        this.product_icon = product_icon;
+        this.iffullscreen = iffullscreen;
+        this.fullscreen_Interval = fullscreen_Interval;
+        this.cycleindex = cycleindex;
+        this.product_updatecode = product_updatecode;
+    }
 
 
 
@@ -61,6 +79,17 @@ public class GoodsBean {
 
 
 
+
+
+
+
+    public String getProduct_updatecode() {
+        return product_updatecode;
+    }
+
+    public void setProduct_updatecode(String product_updatecode) {
+        this.product_updatecode = product_updatecode;
+    }
 
     public boolean isHidLine() {
         return isHidLine;

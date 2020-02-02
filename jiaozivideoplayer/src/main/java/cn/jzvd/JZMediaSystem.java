@@ -197,15 +197,15 @@ public class JZMediaSystem extends JZMediaInterface implements MediaPlayer.OnPre
 
     @Override
     public void onVideoSizeChanged(MediaPlayer mediaPlayer, int width, int height) {
-        JZMediaManager.instance().currentVideoWidth = width;
-        JZMediaManager.instance().currentVideoHeight = height;
-        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (JzvdMgr.getCurrentJzvd() != null) {
-                    JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
-                }
-            }
-        });
+//        JZMediaManager.instance().currentVideoWidth = width;
+//        JZMediaManager.instance().currentVideoHeight = height;
+//        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (JzvdMgr.getCurrentJzvd() != null) {
+//                    JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
+//                }
+//            }
+//        });
     }
 }

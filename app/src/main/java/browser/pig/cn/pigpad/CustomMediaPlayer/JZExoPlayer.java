@@ -110,16 +110,16 @@ public class JZExoPlayer extends JZMediaInterface implements Player.EventListene
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-        JZMediaManager.instance().currentVideoWidth = width;
-        JZMediaManager.instance().currentVideoHeight = height;
-        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (JzvdMgr.getCurrentJzvd() != null) {
-            //        JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
-                }
-            }
-        });
+//        JZMediaManager.instance().currentVideoWidth = width;
+//        JZMediaManager.instance().currentVideoHeight = height;
+//        JZMediaManager.instance().mainThreadHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (JzvdMgr.getCurrentJzvd() != null) {
+//            //        JzvdMgr.getCurrentJzvd().onVideoSizeChanged();
+//                }
+//            }
+//        });
     }
 
     @Override

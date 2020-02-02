@@ -11,17 +11,18 @@ import com.makeramen.roundedimageview.RoundedImageView;
 
 import java.util.List;
 
-import browser.pig.cn.pigpad.bean.GoodsBean;
+
 import browser.pig.cn.pigpad.bean.GoodsListBean;
+import browser.pig.cn.pigpad.bean.Products;
 import cn.my.library.ui.adapter.recycleview.CommonAdapter;
 import cn.my.library.ui.adapter.recycleview.base.ViewHolder;
 
 /**
  * created by dan
  */
-public class GoodsAdapter extends CommonAdapter<GoodsBean> {
+public class GoodsAdapter extends CommonAdapter<Products.GoodsBean> {
 
-    public GoodsAdapter(Context context, List<GoodsBean> datas) {
+    public GoodsAdapter(Context context, List<Products.GoodsBean> datas) {
         super(context, R.layout.item_goods, datas);
     }
     OnGoodsClickListener onGoodsClickListener;
@@ -32,7 +33,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsBean> {
     }
 
     @Override
-    protected void convert(ViewHolder holder, GoodsBean goodsBean, final int position) {
+    protected void convert(ViewHolder holder, Products.GoodsBean goodsBean, final int position) {
 
         RelativeLayout bg  = holder.getView(R.id.bg);
         View v_01 = holder.getView(R.id.v_01);
@@ -115,7 +116,7 @@ public class GoodsAdapter extends CommonAdapter<GoodsBean> {
         notifyDataSetChanged();
     }
     public interface OnGoodsClickListener{
-        void onGoods(GoodsBean goodsBean,int i);
+        void onGoods(Products.GoodsBean goodsBean,int i);
     }
 
     public void setLine(int position){
