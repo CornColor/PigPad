@@ -124,6 +124,7 @@ public abstract class Jzvd extends FrameLayout implements View.OnClickListener, 
     protected long mSeekTimePosition;
     boolean tmp_test_back = false;
 
+
     public Jzvd(Context context) {
         super(context);
         init(context);
@@ -395,8 +396,11 @@ public abstract class Jzvd extends FrameLayout implements View.OnClickListener, 
     }
 
     public void setUp(JZDataSource jzDataSource, int screen) {
-        if (this.jzDataSource != null && jzDataSource.getCurrentUrl() != null &&
-                this.jzDataSource.containsTheUrl(jzDataSource.getCurrentUrl())) {
+//        if (this.jzDataSource != null && jzDataSource.getCurrentUrl() != null &&
+//                this.jzDataSource.containsTheUrl(jzDataSource.getCurrentUrl())) {
+//            return;
+//        }
+        if(jzDataSource == null){
             return;
         }
         if (isCurrentJZVD() && jzDataSource.containsTheUrl(JZMediaManager.getCurrentUrl())) {
@@ -793,18 +797,23 @@ public abstract class Jzvd extends FrameLayout implements View.OnClickListener, 
     }
 
     public void release() {
-        if (jzDataSource.getCurrentUrl().equals(JZMediaManager.getCurrentUrl()) &&
-                (System.currentTimeMillis() - CLICK_QUIT_FULLSCREEN_TIME) > FULL_SCREEN_NORMAL_DELAY) {
-            //在非全屏的情况下只能backPress()
-            if (JzvdMgr.getSecondFloor() != null &&
-                    JzvdMgr.getSecondFloor().currentScreen == SCREEN_WINDOW_FULLSCREEN) {//点击全屏
-            } else if (JzvdMgr.getSecondFloor() == null && JzvdMgr.getFirstFloor() != null &&
-                    JzvdMgr.getFirstFloor().currentScreen == SCREEN_WINDOW_FULLSCREEN) {//直接全屏
-            } else {
-                Log.d(TAG, "releaseMediaPlayer [" + this.hashCode() + "]");
-                releaseAllVideos();
+        try{
+            if (jzDataSource.getCurrentUrl().equals(JZMediaManager.getCurrentUrl()) &&
+                    (System.currentTimeMillis() - CLICK_QUIT_FULLSCREEN_TIME) > FULL_SCREEN_NORMAL_DELAY) {
+                //在非全屏的情况下只能backPress()
+                if (JzvdMgr.getSecondFloor() != null &&
+                        JzvdMgr.getSecondFloor().currentScreen == SCREEN_WINDOW_FULLSCREEN) {//点击全屏
+                } else if (JzvdMgr.getSecondFloor() == null && JzvdMgr.getFirstFloor() != null &&
+                        JzvdMgr.getFirstFloor().currentScreen == SCREEN_WINDOW_FULLSCREEN) {//直接全屏
+                } else {
+                    Log.d(TAG, "releaseMediaPlayer [" + this.hashCode() + "]");
+                    releaseAllVideos();
+                }
             }
+        }catch (Exception e){
+
         }
+
     }
 
     public void initTextureView() {

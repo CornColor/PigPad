@@ -109,6 +109,11 @@ public class StepFragment extends Fragment{
 
             }
         });
+        if(StringUtils.isEmpty(audio)||"0".equals(audio)){
+            ll_yuyin.setVisibility(GONE);
+        }else {
+            ll_yuyin.setVisibility(View.VISIBLE);
+        }
         return view;
     }
 
@@ -123,12 +128,7 @@ public class StepFragment extends Fragment{
         super.onActivityCreated(savedInstanceState);
 
         Glide.with(getActivity()).load(bg).into(iv_bg);
-        if(!StringUtils.isEmpty(audio)){
-            ll_yuyin.setVisibility(View.VISIBLE);
-        }else {
-            ll_yuyin.setVisibility(GONE);
 
-        }
 
 
 

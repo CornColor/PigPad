@@ -45,7 +45,7 @@
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="语音指导："
+                    android:text="语音说明："
                     android:textColor="#8a000000"
                     android:textSize="14sp" />
 

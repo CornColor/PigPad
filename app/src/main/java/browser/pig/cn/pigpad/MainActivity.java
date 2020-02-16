@@ -8,6 +8,8 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -112,6 +114,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     private int fenzhong = 5;
     private boolean isUpDate = false;
     private int type = 0;
+    //private String dId = "f2a2ea692cf81b61";
+    private String dId = DeviceUtils.getAndroidID();
+    private int xunhuan = 1;
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -173,40 +178,81 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (video.currentState == CURRENT_STATE_PAUSE) {
+                    if(video.currentScreen != SCREEN_WINDOW_FULLSCREEN){
+                        if(isUpDate){
+                            return;
+                        }
+                        if(video.jzDataSource == null){
+                            return;
+                        }
+                        if(list == null){
+                            return;
+                        }
+                        Products.GoodsBean goodsBean = null;
+                        int c = 0;
+                        for (int i = 0;i<list.size();i++){
+                            if("1".equals(list.get(i).getIffullscreen())){
+                                goodsBean = list.get(i);
+                                c = i;
+                                break;
 
-
-                        if(mCurrGoods!= null&&"1".equals(mCurrGoods.getIffullscreen())){
+                            }
+                        }
+                       final int index = c;
+                        if(goodsBean == null){
+                            return;
+                        }
+                        if (video.currentState == CURRENT_STATE_PAUSE) {
                             //播放整体列表
                             rV.setVisibility(View.VISIBLE);
-                            video.onEvent(JZUserAction.ON_CLICK_RESUME);
-                            JZMediaManager.start();
-                            video.onStatePlaying();
+                            try{
+                                xunhuan = Integer.valueOf(goodsBean.getCycleindex());
+                            }catch (Exception e){
+                                xunhuan = 1;
+                            }
+
+
+                            video.changeUrl(index, 0);
 
                             tVideoName.setVisibility(View.INVISIBLE);
-                        }
-                            new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
 
-                                if(mCurrGoods!= null&&"1".equals(mCurrGoods.getIffullscreen())){
-                                    if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+
+
+                                    if (video.currentState == CURRENT_STATE_PLAYING) {
                                         video.startWindowFullscreen();
                                         video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
                                     }
-                                }
 
+
+                                }
+                            },1000);
+                        }else {
+                            try{
+                                xunhuan = Integer.valueOf(goodsBean.getCycleindex());
+                            }catch (Exception e){
+                                xunhuan = 1;
                             }
-                        },1000);
-                    }else {
-                        //播放整体列表
-                        if(mCurrGoods!= null&&"1".equals(mCurrGoods.getIffullscreen())){
-                            if (video.currentState == CURRENT_STATE_PLAYING&&!isUpDate) {
+                            if (video.currentState == CURRENT_STATE_PLAYING) {
                                 video.startWindowFullscreen();
                                 video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
                             }
+
+
+                            //播放整体列表
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    video.changeUrl(index, 0);
+
+                                }
+                            },1000);
+
                         }
                     }
+
 
 
 
@@ -215,6 +261,14 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         }
     }
 
+
+    public int getXunhuan() {
+        return xunhuan;
+    }
+
+    public void setXunhuan(int xunhuan) {
+        this.xunhuan = xunhuan;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -252,11 +306,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onStop();
         stopTimer();
         AudioPlay.getInstance().stop();
-        if(video!= null){
-            video.release();
-        }
-
-
     }
 
     private void stopTimer() {
@@ -331,34 +380,49 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     public void onChangeX(int i) {
-        if (i >= 0 && i < list.size()) {
-            adapter.updata(i);
-        }
-        if(type == 1){
-            rV.setVisibility(View.INVISIBLE);
-            tVideoName.setVisibility(View.VISIBLE);
-            tvVideo.setBackgroundColor(Color.parseColor("#EEEEEE"));
-            tvVideo.setTextColor(Color.parseColor("#61000000"));
-            rV01.setVisibility(View.VISIBLE);
-            tvDownload.setBackgroundResource(R.drawable.shape_01);
-            tvDownload.setTextColor(Color.WHITE);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (video.currentState == CURRENT_STATE_PLAYING) {
-                        video.onEvent(JZUserAction.ON_CLICK_PAUSE);
-                        JZMediaManager.pause();
-                        video.onStatePause();
-                    }
+        for (int index = 0;index<list.size();index++){
+           final int c = index;
+            if(mCurrGoods.getProduct_id().equals(list.get(index).getProduct_id())){
+                adapter.updata(index);
+                //播放整体列表
+                if(type == 1){
+                    rV.setVisibility(View.INVISIBLE);
+                    tVideoName.setVisibility(View.VISIBLE);
+                    tvVideo.setBackgroundColor(Color.parseColor("#EEEEEE"));
+                    tvVideo.setTextColor(Color.parseColor("#61000000"));
+                    rV01.setVisibility(View.VISIBLE);
+                    tvDownload.setBackgroundResource(R.drawable.shape_01);
+                    tvDownload.setTextColor(Color.WHITE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (video.currentState == CURRENT_STATE_PLAYING) {
+                                video.onEvent(JZUserAction.ON_CLICK_PAUSE);
+                                JZMediaManager.pause();
+                                video.onStatePause();
+                            }
 
+                        }
+                    },1000);
+                }else {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            video.changeUrl(c, 0);
+
+                        }
+                    },1000);
                 }
-            },1000);
+            }
         }
-    }
-    public void onChangeZ() {
-         startTimer();
+
+
     }
 
+    public List<Products.GoodsBean> getGoods(){
+        return list;
+
+    }
 
     @Override
     public void initPresenter() {
@@ -411,17 +475,19 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     @Override
     public void onBackPressed() {
-      //  if (Jzvd.backPress()) {
-        //    return;
-        //}
         super.onBackPressed();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Jzvd.goOnPlayOnResume();
-        startTimer();
+        try{
+            Jzvd.goOnPlayOnResume();
+        }catch (Exception e){
+
+        }
+
+
 
     }
 
@@ -487,7 +553,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
             return;
         }
         OkGo.<BaseBean>post(CREATE_D)
-                .params("device_id",DeviceUtils.getAndroidID())
+                .params("device_id",dId)
                 .execute(new CommonCallback<BaseBean>(BaseBean.class) {
 
                     @Override
@@ -531,7 +597,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
             return;
         }
         OkGo.<BaseBean>post(UPDATA)
-                .params("device_id", DeviceUtils.getAndroidID())
+                .params("device_id", dId)
                 .params("product_id", product_id)
                 .execute(new CommonCallback<BaseBean>(BaseBean.class) {
 
@@ -608,6 +674,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
 
+
+
     private void loadXinTiao1() {
         if(!NetworkUtils.isConnected()){
             return;
@@ -616,8 +684,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(isDownload){
             return;
         }
+        if(isUpDate){
+            return;
+        }
         OkGo.<Products>post(XINTIAO)
-                .params("device_id", DeviceUtils.getAndroidID())
+                .params("device_id", dId)
                 .execute(new CommonCallback<Products>(Products.class) {
                     @Override
                     public void onStart(Request<Products, ? extends Request> request) {
@@ -634,79 +705,88 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     @Override
                     public void onFailure(String code, String s) {
                         showToast(s);
-//                        new Handler().postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (video.currentState == CURRENT_STATE_PAUSE) {
-//                                    video.onEvent(JZUserAction.ON_CLICK_RESUME);
-//                                    JZMediaManager.start();
-//                                    video.onStatePlaying();
-//                                }
-//
-//                            }
-//                        },1000);
-
                     }
 
                     @Override
                     public void onError(Response<Products> response) {
                         super.onError(response);
-//                        new Handler().postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                if (video.currentState == CURRENT_STATE_PAUSE) {
-//                                    video.onEvent(JZUserAction.ON_CLICK_RESUME);
-//                                    JZMediaManager.start();
-//                                    video.onStatePlaying();
-//                                }
-//
-//                            }
-//                        },1000);
                     }
 
                     @Override
                     public void onSuccess(Products products) {
 
 
-                        if(products!= null)
-                            if(products.getData().getUpdatecode() == 0){
-                                 cancelProgressDialog();
-                                 return;
+                        if (products != null)
+                        {
+
+                            if (products.getData().getUpdatecode() == 0) {
+                                cancelProgressDialog();
+                                showToast("无数据更新");
+                                return;
                             }
 
-                            if(list!= null&&products.getData().getProducts()!= null){
-                                for (int i = 0; i < list.size(); i++) {
-
-                                    boolean isC =false;
-                                    for (int j =0;j<products.getData().getProducts().size();j++){
-
-                                        if(list.get(i).getProduct_id().equals(products.getData().getProducts().get(j).getProduct_id())){
-                                            isC = true;
-                                        }
-
-                                    }
-                                    if(!isC){
-                                        if(FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
-                                                FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
-                                            FileUtils.delete(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id()));
-                                        }
-                                    }
-
+                                try{
+                                    Jzvd.backPress();
+                                    onChangeX(0);
+                                }catch (Exception e){
 
                                 }
+                                //quit fullscreen
 
+
+
+                            if(products.getData().getProducts()!= null){
+                                for (int j =0;j<products.getData().getProducts().size();j++){
+                                    if("1".equals(products.getData().getProducts().get(j).getProduct_updatecode())){
+                                        try{
+                                            deleteDirectory(FilePathUtil.getFilePath(MainActivity.this, products.getData().getProducts().get(j).getProduct_id()));
+                                        }catch (Exception e){
+
+                                        }
+
+                                    }
+                                }
                             }
                         DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
                         DbHelper.getInstance().stepABeanLongDBManager().deleteAll();
-                        list.clear();
+
                         List<Products.GoodsBean> goodsBeans = products.getData().getProducts();
+
+                        for (int i = 0;i<goodsBeans.size();i++){
+                            Products.GoodsBean goodsBean = goodsBeans.get(i);
+
+
+
+                            for (int j = 0; j < list.size(); j++) {
+                                Products.GoodsBean goodsBean1 = list.get(j);
+                                if(goodsBean1.getProduct_id().equals(goodsBean.getProduct_id())){
+                                    if("0".equals(goodsBean.getProduct_updatecode())){
+                                      goodsBean.upadata(goodsBean1.getProduct_id(),
+                                              goodsBean1.getProduct_name(),
+                                              goodsBean1.getProduct_video(),
+                                              goodsBean1.getRemarks(),
+                                              goodsBean1.getProduct_icon(),
+                                              false,
+                                              false,
+                                              goodsBean1.getIffullscreen(),
+                                              goodsBean1.getFullscreen_Interval(),
+                                              goodsBean1.getCycleindex(),
+                                              goodsBean1.getProduct_updatecode(),
+                                              goodsBean1.getSteps());
+                                    }
+                                }
+
+
+
+                            }
+                        }
+                            list.clear();
 
                         List<GoodsBean> goodsList = new ArrayList<>();
 
-                        if(goodsBeans!= null&&goodsBeans.size()>0){
+                        if (goodsBeans != null && goodsBeans.size() > 0) {
 
-                            for (int i =0;i<goodsBeans.size();i++){
+                            for (int i = 0; i < goodsBeans.size(); i++) {
                                 Products.GoodsBean pro = goodsBeans.get(i);
                                 GoodsBean goodsBean = new GoodsBean(pro.getProduct_id(),
                                         pro.getProduct_name(),
@@ -716,20 +796,21 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                         pro.getIffullscreen(),
                                         pro.getFullscreen_Interval(),
                                         pro.getCycleindex(),
-                                        pro.getProduct_updatecode()
+                                        pro.getProduct_updatecode(),
+                                        pro.getProduct_state()
                                 );
                                 goodsList.add(goodsBean);
 
                                 DbHelper.getInstance().goodsBeanLongDBManager().insert(goodsBean);
                                 List<Products.StepBean> stepBeans = pro.getSteps();
-                                if(stepBeans!= null){
-                                    for (int j =0;j<stepBeans.size();j++){
+                                if (stepBeans != null) {
+                                    for (int j = 0; j < stepBeans.size(); j++) {
                                         Products.StepBean sp = stepBeans.get(j);
                                         StepABean stepABean = new StepABean(sp.getStep_id(),
-                                                pro.getProduct_id(),sp.getStep_num(),sp.getStep_text(),
+                                                pro.getProduct_id(), sp.getStep_num(), sp.getStep_text(),
                                                 sp.getStep_img(),
                                                 sp.getStep_voice(),
-                                                sp.getProduct_name(),sp.getProduct_video(),
+                                                sp.getProduct_name(), sp.getProduct_video(),
                                                 sp.getRemarks());
                                         DbHelper.getInstance().stepABeanLongDBManager().insert(stepABean);
                                     }
@@ -737,53 +818,50 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 }
 
 
-
                             }
-
-
-
-
-                            mCurrGoods = goodsBeans.get(0);
-                            if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
-                                try{
+                            list.addAll(goodsBeans);
+                            mCurrGoods = list.get(0);
+                            mCurrGoods.setSelect(true);
+                            adapter.setLine(0);
+                            if (mCurrGoods != null) {
+                                try {
                                     fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     fenzhong = 5;
                                 }
 
                             }
-                            mCurrGoods.setSelect(true);
-                            adapter.setLine(0);
-                            list.addAll(goodsBeans);
-
-
                             tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
                             int downCount = 0;
 
                             for (int i = 0; i < list.size(); i++) {
-                                if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                        + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
-                                        FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                if (!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                        + File.separator +
+                                        FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))) {
                                     downCount++;
                                 }
 
                                 List<Products.StepBean> stepBeans = list.get(i).getSteps();
-                                if(stepBeans!= null){
-                                    for (int j =0;j<stepBeans.size();j++){
+                                if (stepBeans != null) {
+                                    for (int j = 0; j < stepBeans.size(); j++) {
                                         Products.StepBean stepBean = stepBeans.get(j);
                                         stepBean.setProduct_id(list.get(i).getProduct_id());
                                         loadImg(stepBean.getStep_img());
+                                        if(StringUtils.isEmpty(stepBean.getStep_voice())||"0".equals(stepBean.getStep_voice())){
 
-                                        if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
-                                            downCount++;
+                                        }else {
+                                            if (!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                    + File.separator +
+                                                    FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))) {
+                                                downCount++;
+                                            }
                                         }
+
                                     }
                                 }
 
                             }
-                            if(downCount>0){
+                            if (downCount > 0) {
                                 rV.setVisibility(View.VISIBLE);
                                 tvVideo.setBackgroundResource(R.drawable.shape_01);
                                 tvVideo.setTextColor(Color.WHITE);
@@ -800,58 +878,63 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                     video.onStatePause();
 
                                 }
-                                Jzvd.backPress();
+
 
 
                                 List<GoodsPath> goodsPaths = new ArrayList<>();
                                 for (int i = 0; i < list.size(); i++) {
 
-                                    if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                            + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
-                                            FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
+                                    if (!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                            + File.separator  +
+                                            FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))) {
 
                                         GoodsPath goodsPath = new GoodsPath();
                                         goodsPath.setUrl(list.get(i).getProduct_video());
                                         goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                + File.separator  +
                                                 FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video()));
                                         goodsPaths.add(goodsPath);
 
 
                                     }
                                     List<Products.StepBean> stepBeans = list.get(i).getSteps();
-                                    if(stepBeans!= null){
-                                        for (int j =0;j<stepBeans.size();j++){
+                                    if (stepBeans != null) {
+                                        for (int j = 0; j < stepBeans.size(); j++) {
                                             Products.StepBean stepBean = stepBeans.get(j);
                                             stepBean.setProduct_id(list.get(i).getProduct_id());
+                                            if(StringUtils.isEmpty(stepBean.getStep_voice())||"0".equals(stepBean.getStep_voice())){
 
-                                            if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                    + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                    FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
-                                                GoodsPath goodsPath = new GoodsPath();
-                                                goodsPath.setUrl(stepBean.getStep_voice());
-                                                goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                        + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                        FileUtils.getFileNameWithSuffix(stepBean.getStep_voice()));
-                                                goodsPaths.add(goodsPath);
+                                            }else {
+                                                if (!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                        + File.separator +
+                                                        FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))) {
+                                                    GoodsPath goodsPath = new GoodsPath();
+                                                    goodsPath.setUrl(stepBean.getStep_voice());
+                                                    goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                            + File.separator +
+                                                            FileUtils.getFileNameWithSuffix(stepBean.getStep_voice()));
+                                                    goodsPaths.add(goodsPath);
+                                                }
                                             }
+
                                         }
                                     }
 
                                 }
 
                                 start_multi(goodsPaths);
-                            }else {
+                            } else {
+                                startTimer();
                                 cancelProgressDialog();
                                 LinkedHashMap<String, String> map = new LinkedHashMap<>();
                                 if (list != null && list.size() > 0) {
                                     for (int i = 0; i < list.size(); i++) {
                                         //插入数据库
 
-                                        if(!downLoadGoods(list.get(i))){
+                                        if (!downLoadGoods(list.get(i))) {
                                             map.put(list.get(i).getProduct_id(),
                                                     getLoctionPath(list.get(i)));
-                                        }else {
+                                        } else {
                                             map.put(list.get(i).getProduct_id(),
                                                     list.get(i).getProduct_video());
                                         }
@@ -868,10 +951,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 JZDataSource dataSource = new JZDataSource(map, "");
                                 video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                 video.startVideo();
-                                video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()==null?"0":mCurrGoods.getCycleindex()));
-                                video.startVideo();
-                                adapter.notifyDataSetChanged();
 
+                                adapter.notifyDataSetChanged();
 
 
                                 if (mCurrGoods != null) {
@@ -880,166 +961,169 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                                         StepFragment stepFragment = new StepFragment();
                                         Bundle bundle = new Bundle();
-                                        if(!downLoadStep(mCurrGoods.getSteps().get(i))){
-                                            bundle.putString("audio",getLoctionPath(mCurrGoods.getSteps().get(i)));
-                                        }else {
+                                        if (!downLoadStep(mCurrGoods.getSteps().get(i))) {
+                                            bundle.putString("audio", getLoctionPath(mCurrGoods.getSteps().get(i)));
+                                        } else {
                                             bundle.putString("audio", mCurrGoods.getSteps().get(i).getStep_voice());
                                         }
                                         bundle.putString("bg", mCurrGoods.getSteps().get(i).getStep_img());
                                         stepFragment.setArguments(bundle);
                                         fragments.add(stepFragment);
                                     }
-                                    stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
+                                    clearData();
+                                    stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),MainActivity.this, fragments);
                                     vp.setAdapter(stepPageAdapter);
                                     vp.setCurrentItem(0);
                                     indicator.setViewPager(vp);
 
 
                                 }
+                                for (int i = 0;i<list.size();i++){
+                                    updata(list.get(i).getProduct_id());
+                                }
 
                             }
 
                         }
 
 
+                        List<Products.GoodsBean> goodsBeans1 = new ArrayList<>();
 
-                        if(products.getData().getUpdatecode() == 1){//数据没有更新
-
-                            for (int i = 0;i<list.size();i++){
-                                if("1".equals(list.get(i).getProduct_updatecode())){
-                                    updata(list.get(i).getProduct_id());
-
+                            for (int i = 0; i < list.size(); i++) {
+                                //插入数据库
+                                if("1".equals(list.get(i).getProduct_state())){
+                                    goodsBeans1.add(list.get(i));
                                 }
                             }
-
-
-                        }
+                            list.clear();
+                            list.addAll(goodsBeans1);
                         adapter.notifyDataSetChanged();
+                    }
 
                     }
                 });
     }
 
 
-    private void loadXinTiao() {
-        if(!NetworkUtils.isConnected()){
-            List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
-            if(lgoods!= null){
+    public void noNetwork(){
+        List<GoodsBean> lgoods =  DbHelper.getInstance().goodsBeanLongDBManager().loadAll();
+        if(lgoods!= null){
 
-                List<Products.GoodsBean> goodsBeans = new ArrayList<>();
-
-
-                for (int i =0;i<lgoods.size();i++){
-
-                    List<Products.StepBean> stepBeans = new ArrayList<>();
-                    List<StepABean> stepABeans = DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(lgoods.get(i).getProduct_id())).build().list();
-                    if(stepABeans!= null){
-                        for (int j =0;j<stepABeans.size();j++){
-                            Products.StepBean stepBean = new Products.StepBean(stepABeans.get(j).getStep_id(),
-                                    stepABeans.get(j).getProduct_id(),
-                                    stepABeans.get(j).getStep_num(),
-                                    stepABeans.get(j).getStep_text(),
-                                    stepABeans.get(j).getStep_img(),
-                                    stepABeans.get(j).getStep_voice(),
-                                    stepABeans.get(j).getProduct_name(),
-                                    stepABeans.get(j).getProduct_video(),
-                                    stepABeans.get(j).getRemarks()
-                                    );
-
-                            stepBeans.add(stepBean);
-                        }
-                    }
-
-                    Products.GoodsBean goodsBean = new Products.GoodsBean(lgoods.get(i).getProduct_id(),
-                            lgoods.get(i).getProduct_name(),
-                            lgoods.get(i).getProduct_video(),
-                            lgoods.get(i).getRemarks(),
-                            lgoods.get(i).getProduct_icon(),
-                            lgoods.get(i).getIsSelect(),
-                            lgoods.get(i).getIsHidLine(),
-                            lgoods.get(i).getIffullscreen(),
-                            lgoods.get(i).getFullscreen_Interval(),
-                            lgoods.get(i).getCycleindex(),
-                            lgoods.get(i).getProduct_updatecode(),
-                            stepBeans);
-                    goodsBeans.add(goodsBean);
-
-                }
-                 list.clear();
-                list.addAll(goodsBeans);
-                if(list.size()>0){
-                    mCurrGoods = list.get(0);
-                    mCurrGoods.setSelect(true);
-                    if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
-                        try{
-                            fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
-                        }catch (Exception e){
-                            fenzhong = 5;
-                        }
-
-                    }
-                    LinkedHashMap<String, String> map = new LinkedHashMap<>();
-                    if (list != null && list.size() > 0) {
-                        for (int i = 0; i < list.size(); i++) {
-                            //插入数据库
-                            if(!downLoadGoods(list.get(i))){
-                                map.put(list.get(i).getProduct_id(),
-                                        getLoctionPath(list.get(i)));
-                            }else {
-                                map.put(list.get(i).getProduct_id(),
-                                        list.get(i).getProduct_video());
-                            }
+            List<Products.GoodsBean> goodsBeans = new ArrayList<>();
 
 
-                        }
+            for (int i =0;i<lgoods.size();i++){
 
-                    }
-                    JZDataSource dataSource = new JZDataSource(map, "");
-                    video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                    if(!StringUtils.isEmpty(mCurrGoods.getCycleindex())){
-                        try {
-                            video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()));
-                        }catch (Exception e){
+                List<Products.StepBean> stepBeans = new ArrayList<>();
+                List<StepABean> stepABeans = DbHelper.getInstance().stepABeanLongDBManager().queryBuilder().where(StepABeanDao.Properties.Product_id.eq(lgoods.get(i).getProduct_id())).build().list();
+                if(stepABeans!= null){
+                    for (int j =0;j<stepABeans.size();j++){
+                        Products.StepBean stepBean = new Products.StepBean(stepABeans.get(j).getStep_id(),
+                                stepABeans.get(j).getProduct_id(),
+                                stepABeans.get(j).getStep_num(),
+                                stepABeans.get(j).getStep_text(),
+                                stepABeans.get(j).getStep_img(),
+                                stepABeans.get(j).getStep_voice(),
+                                stepABeans.get(j).getProduct_name(),
+                                stepABeans.get(j).getProduct_video(),
+                                stepABeans.get(j).getRemarks()
+                        );
 
-                        }
-                    }
-                    video.startVideo();
-
-
-
-                    adapter.setLine(0);
-                    adapter.notifyDataSetChanged();
-                    if (mCurrGoods != null) {
-                        List<Fragment> fragments = new ArrayList<>();
-                        for (int i = 0; i < mCurrGoods.getSteps().size(); i++) {
-
-                            StepFragment stepFragment = new StepFragment();
-                            Bundle bundle = new Bundle();
-                            if(!downLoadStep(mCurrGoods.getSteps().get(i))){
-                                bundle.putString("audio",getLoctionPath(mCurrGoods.getSteps().get(i)));
-                            }else {
-                                bundle.putString("audio", mCurrGoods.getSteps().get(i).getStep_voice());
-                            }
-                            bundle.putString("bg", mCurrGoods.getSteps().get(i).getStep_img());
-                            stepFragment.setArguments(bundle);
-                            fragments.add(stepFragment);
-                        }
-                        stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
-                        vp.setAdapter(stepPageAdapter);
-                        vp.setCurrentItem(0);
-                        indicator.setViewPager(vp);
-
-
+                        stepBeans.add(stepBean);
                     }
                 }
+
+                Products.GoodsBean goodsBean = new Products.GoodsBean(lgoods.get(i).getProduct_id(),
+                        lgoods.get(i).getProduct_name(),
+                        lgoods.get(i).getProduct_video(),
+                        lgoods.get(i).getRemarks(),
+                        lgoods.get(i).getProduct_icon(),
+                        lgoods.get(i).getIsSelect(),
+                        lgoods.get(i).getIsHidLine(),
+                        lgoods.get(i).getIffullscreen(),
+                        lgoods.get(i).getFullscreen_Interval(),
+                        lgoods.get(i).getCycleindex(),
+                        lgoods.get(i).getProduct_updatecode(),
+                        stepBeans);
+                goodsBeans.add(goodsBean);
 
             }
+            list.clear();
+            list.addAll(goodsBeans);
+            if(list.size()>0){
+                mCurrGoods = list.get(0);
+                mCurrGoods.setSelect(true);
+                if(mCurrGoods!= null){
+                    try{
+                        fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
+                    }catch (Exception e){
+                        fenzhong = 5;
+                    }
 
+                }
+                startTimer();
+                LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                if (list != null && list.size() > 0) {
+                    for (int i = 0; i < list.size(); i++) {
+                        //插入数据库
+                        if(!downLoadGoods(list.get(i))){
+                            map.put(list.get(i).getProduct_id(),
+                                    getLoctionPath(list.get(i)));
+                        }else {
+                            map.put(list.get(i).getProduct_id(),
+                                    list.get(i).getProduct_video());
+                        }
+
+
+                    }
+
+                }
+                JZDataSource dataSource = new JZDataSource(map, "");
+                video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
+
+                video.startVideo();
+
+
+
+                adapter.setLine(0);
+                adapter.notifyDataSetChanged();
+                if (mCurrGoods != null) {
+                    List<Fragment> fragments = new ArrayList<>();
+                    for (int i = 0; i < mCurrGoods.getSteps().size(); i++) {
+
+                        StepFragment stepFragment = new StepFragment();
+                        Bundle bundle = new Bundle();
+                        if(!downLoadStep(mCurrGoods.getSteps().get(i))){
+                            bundle.putString("audio",getLoctionPath(mCurrGoods.getSteps().get(i)));
+                        }else {
+                            bundle.putString("audio", mCurrGoods.getSteps().get(i).getStep_voice());
+                        }
+                        bundle.putString("bg", mCurrGoods.getSteps().get(i).getStep_img());
+                        stepFragment.setArguments(bundle);
+                        fragments.add(stepFragment);
+                    }
+                    clearData();
+                    stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),MainActivity.this, fragments);
+                    vp.setAdapter(stepPageAdapter);
+                    vp.setCurrentItem(0);
+                    indicator.setViewPager(vp);
+
+
+                }
+            }
+
+        }
+
+    }
+
+    private void loadXinTiao() {
+        if(!NetworkUtils.isConnected()){
+             noNetwork();
             return;
         }
 
                 OkGo.<Products>post(XINTIAO)
-                        .params("device_id", DeviceUtils.getAndroidID())
+                        .params("device_id", dId)
                         .execute(new CommonCallback<Products>(Products.class) {
                             @Override
                             public void onStart(Request<Products, ? extends Request> request) {
@@ -1070,29 +1154,20 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                     return;
                                     }
 
-                                if(list!= null&&products.getData().getProducts()!= null){
-                                    for (int i = 0; i < list.size(); i++) {
 
-                                        boolean isC =false;
-                                        for (int j =0;j<products.getData().getProducts().size();j++){
+                                if(products.getData().getProducts()!= null){
+                                    for (int j =0;j<products.getData().getProducts().size();j++){
+                                        if("1".equals(products.getData().getProducts().get(j).getProduct_updatecode())){
+                                            try{
+                                                deleteDirectory(FilePathUtil.getFilePath(MainActivity.this, products.getData().getProducts().get(j).getProduct_id()));
+                                            }catch (Exception e){
 
-                                            if(list.get(i).getProduct_id().equals(products.getData().getProducts().get(j).getProduct_id())){
-                                                isC = true;
                                             }
 
                                         }
-                                        if(!isC){
-                                            if(FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                    + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
-                                                    FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
-                                                FileUtils.delete(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id()));
-                                            }
-                                        }
-
-
                                     }
-
                                 }
+
                                 DbHelper.getInstance().goodsBeanLongDBManager().deleteAll();
                                     DbHelper.getInstance().stepABeanLongDBManager().deleteAll();
                                     list.clear();
@@ -1112,7 +1187,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                                    pro.getIffullscreen(),
                                                    pro.getFullscreen_Interval(),
                                                    pro.getCycleindex(),
-                                                   pro.getProduct_updatecode()
+                                                   pro.getProduct_updatecode(),
+                                                   pro.getProduct_state()
                                                    );
                                            goodsList.add(goodsBean);
 
@@ -1140,7 +1216,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
 
                                        mCurrGoods = goodsBeans.get(0);
-                                       if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
+                                       if(mCurrGoods!= null){
                                            try{
                                                fenzhong = Integer.valueOf(mCurrGoods.getFullscreen_Interval());
                                            }catch (Exception e){
@@ -1158,7 +1234,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                                        for (int i = 0; i < list.size(); i++) {
                                            if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                   + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                   + File.separator +
                                                    FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
                                                downCount++;
                                            }
@@ -1170,11 +1246,16 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                                    stepBean.setProduct_id(list.get(i).getProduct_id());
                                                    loadImg(stepBean.getStep_img());
 
-                                                   if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                           + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                           FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
-                                                       downCount++;
+                                                   if(StringUtils.isEmpty(stepBean.getStep_voice())||"0".equals(stepBean.getStep_voice())){
+
+                                                   }else {
+                                                       if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                               + File.separator +
+                                                               FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
+                                                           downCount++;
+                                                       }
                                                    }
+
                                                }
                                            }
 
@@ -1184,13 +1265,13 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                            for (int i = 0; i < list.size(); i++) {
 
                                                if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                       + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                       + File.separator +
                                                        FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video())))){
 
                                                     GoodsPath goodsPath = new GoodsPath();
                                                     goodsPath.setUrl(list.get(i).getProduct_video());
                                                     goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                            + File.separator + FileUtils.getFileNameByUrl(list.get(i).getProduct_video())  +
+                                                            + File.separator +
                                                             FileUtils.getFileNameWithSuffix(list.get(i).getProduct_video()));
                                                     goodsPaths.add(goodsPath);
 
@@ -1201,17 +1282,22 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                                    for (int j =0;j<stepBeans.size();j++){
                                                        Products.StepBean stepBean = stepBeans.get(j);
                                                        stepBean.setProduct_id(list.get(i).getProduct_id());
+                                                       if(StringUtils.isEmpty(stepBean.getStep_voice())||"0".equals(stepBean.getStep_voice())){
 
-                                                       if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                               + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                               FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
-                                                           GoodsPath goodsPath = new GoodsPath();
-                                                           goodsPath.setUrl(stepBean.getStep_voice());
-                                                           goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
-                                                                   + File.separator + FileUtils.getFileNameByUrl(stepBean.getStep_voice())  +
-                                                                   FileUtils.getFileNameWithSuffix(stepBean.getStep_voice()));
-                                                           goodsPaths.add(goodsPath);
+                                                       }else {
+                                                           if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                                   + File.separator +
+                                                                   FileUtils.getFileNameWithSuffix(stepBean.getStep_voice())))){
+                                                               GoodsPath goodsPath = new GoodsPath();
+                                                               goodsPath.setUrl(stepBean.getStep_voice());
+                                                               goodsPath.setLocationPath(FilePathUtil.getFilePath(MainActivity.this, list.get(i).getProduct_id())
+                                                                       + File.separator +
+                                                                       FileUtils.getFileNameWithSuffix(stepBean.getStep_voice()));
+                                                               goodsPaths.add(goodsPath);
+                                                           }
                                                        }
+
+
                                                    }
                                                }
 
@@ -1219,6 +1305,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
                                            start_multi(goodsPaths);
                                        }else {
+                                           startTimer();
                                            cancelProgressDialog();
                                            LinkedHashMap<String, String> map = new LinkedHashMap<>();
                                            if (list != null && list.size() > 0) {
@@ -1243,8 +1330,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                            JZDataSource dataSource = new JZDataSource(map, "");
                                            video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
                                            video.startVideo();
-                                           video.setCount(Integer.valueOf(mCurrGoods.getCycleindex()==null?"0":mCurrGoods.getCycleindex()));
-                                           video.startVideo();
                                            adapter.notifyDataSetChanged();
 
 
@@ -1264,7 +1349,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                                    stepFragment.setArguments(bundle);
                                                    fragments.add(stepFragment);
                                                }
-                                               stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
+                                               clearData();
+                                               stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),MainActivity.this, fragments);
                                                vp.setAdapter(stepPageAdapter);
                                                vp.setCurrentItem(0);
                                                indicator.setViewPager(vp);
@@ -1273,35 +1359,64 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                            }
 
                                        }
+                                       for (int i = 0;i<list.size();i++){
+                                               updata(list.get(i).getProduct_id());
+                                       }
 
                                    }
 
 
 
-                                    if(products.getData().getUpdatecode() == 1){//数据没有更新
+//                                    if(products.getData().getUpdatecode() == 1){//数据没有更新
+//
+//                                       for (int i = 0;i<list.size();i++){
+//                                               updata(list.get(i).getProduct_id());
+//                                       }
+//
+//
+//                                    }
+                                List<Products.GoodsBean> goodsBeans1 = new ArrayList<>();
 
-                                       for (int i = 0;i<list.size();i++){
-                                           if("1".equals(list.get(i).getProduct_updatecode())){
-                                               updata(list.get(i).getProduct_id());
-
-                                           }
-                                       }
-
-
+                                for (int i = 0; i < list.size(); i++) {
+                                    //插入数据库
+                                    if("1".equals(list.get(i).getProduct_state())){
+                                        goodsBeans1.add(list.get(i));
                                     }
+                                }
+                                list.clear();
+                                list.addAll(goodsBeans1);
                                 adapter.notifyDataSetChanged();
 
                             }
                         });
             }
 
+   private void clearData(){
+        if(stepPageAdapter!= null){
+            stepPageAdapter.clear(vp);
+        }
+//        if(vp.getAdapter()!= null){
+//            FragmentManager fm = getSupportFragmentManager();
+//            FragmentTransaction ft = fm.beginTransaction();
+//            List<Fragment> fragments = fm.getFragments();
+//            if(fragments != null && fragments.size() >0){
+//                for (int i = 0; i < fragments.size(); i++) {
+//                    ft.remove(fragments.get(i));
+//                }
+//            }
+//            ft.commit();}
 
+
+   }
 
 
     @Override
     public void onGoods(Products.GoodsBean goodsBean, int c) {
         try{
-            AudioPlay.getInstance().stop();
+            if(AudioPlay.getInstance().isPlay()){
+                AudioPlay.getInstance().stop();
+            }
+
             mCurrGoods = goodsBean;
             if(mCurrGoods!= null&&StringUtils.isEmpty(mCurrGoods.getFullscreen_Interval())){
                 try{
@@ -1312,7 +1427,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
             }
             tVideoName.setText("“" + mCurrGoods.getProduct_name() + "”" + "介绍视频");
-            video.changeUrl(c, 1000);
+            video.changeUrl(c, 0);
 
 
             if (mCurrGoods != null) {
@@ -1330,7 +1445,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     stepFragment.setArguments(bundle);
                     fragments.add(stepFragment);
                 }
-                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
+                clearData();
+                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),MainActivity.this, fragments);
                 vp.setAdapter(stepPageAdapter);
                 vp.setCurrentItem(0);
                 indicator.setViewPager(vp);
@@ -1444,7 +1560,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     private boolean downLoadGoods(Products.GoodsBean goodsBean){
         if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getProduct_video())  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video())))){
+                + File.separator  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video())))){
             zyFlieDownLoad(goodsBean.getProduct_video(),goodsBean.getProduct_id(),downloadListener1);
             return true;
         }
@@ -1454,7 +1570,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
 
     private boolean downLoadStep(Products.StepBean goodsBean){
         if(!FileUtils.isFileExists(new File(FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice())))){
+                + File.separator +  FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice())))){
             zyFlieDownLoad(goodsBean.getStep_voice(), goodsBean.getProduct_id(), downloadListener1);
             return true;
         }
@@ -1462,12 +1578,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
     public String getLoctionPath(Products.GoodsBean goodsBean){
         return FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getProduct_video())  + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video());
+                + File.separator   + FileUtils.getFileNameWithSuffix(goodsBean.getProduct_video());
     }
 
     public String getLoctionPath(Products.StepBean goodsBean){
         return FilePathUtil.getFilePath(this, goodsBean.getProduct_id())
-                + File.separator + FileUtils.getFileNameByUrl(goodsBean.getStep_voice())  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice());
+                + File.separator  + FileUtils.getFileNameWithSuffix(goodsBean.getStep_voice());
     }
 
     private int count = 0;
@@ -1480,7 +1596,6 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(goodsPaths == null || goodsPaths.size()<=0){
             return;
         }
-
          count = 0;
         sum = 0;
         count = goodsPaths.size();
@@ -1499,18 +1614,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         //(3) 设置参数
 
         // 每个任务的进度 无回调
-        //queueSet.disableCallbackProgressTimes();
         // do not want each task's download progress's callback,we just consider which task will completed.
-
-        queueSet.setCallbackProgressTimes(100);
-        queueSet.setCallbackProgressMinInterval(100);
         //失败 重试次数
-        queueSet.setAutoRetryTimes(10);
+        queueSet.setAutoRetryTimes(3);
 
-        //避免掉帧
-        FileDownloader.enableAvoidDropFrame();
 
-        //(4)串行下载
+        //(4)并行执行
         queueSet.downloadSequentially(tasks);
         showProgressDialog("正在下载（"+sum+"/"+count+"）");
         //(5)任务启动
@@ -1551,13 +1660,14 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        showProgressDialog("正在下载（"+sum+"/"+count+"）");
+
                         if(sum == count){
+                            startTimer();
                             cancelProgressDialog();
                             isDownload = false;
                             showToast("下载完成");
                             cancelProgressDialog();
-                            LinkedHashMap<String, String> map = new LinkedHashMap<>();
+                           final LinkedHashMap<String, String> map = new LinkedHashMap<>();
                             if (list != null && list.size() > 0) {
                                 for (int i = 0; i < list.size(); i++) {
                                     //插入数据库
@@ -1574,40 +1684,58 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 }
 
                             }
-                            if(video.jzDataSource!= null&&(video.currentState == CURRENT_STATE_PAUSE||video.currentScreen == CURRENT_STATE_PLAYING)){
-                                video.release();
+                            try{
+                                Jzvd.clearSavedProgress(MainActivity.this, null);
+                                Jzvd.releaseAllVideos();
+                            }catch (Exception e){
+
                             }
+                             new Handler().postDelayed(new Runnable() {
+                                 @Override
+                                 public void run() {
+
+                                     JZDataSource dataSource = new JZDataSource(map, "");
+                                     video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
+                                     video.startVideo();
+                                     adapter.notifyDataSetChanged();
+
+
+                                     if (mCurrGoods != null) {
+                                         List<Fragment> fragments = new ArrayList<>();
+                                         for (int i = 0; i < mCurrGoods.getSteps().size(); i++) {
+
+                                             StepFragment stepFragment = new StepFragment();
+                                             Bundle bundle = new Bundle();
+                                             if (!downLoadStep(mCurrGoods.getSteps().get(i))) {
+                                                 bundle.putString("audio", getLoctionPath(mCurrGoods.getSteps().get(i)));
+                                             } else {
+                                                 bundle.putString("audio", mCurrGoods.getSteps().get(i).getStep_voice());
+                                             }
+                                             bundle.putString("bg", mCurrGoods.getSteps().get(i).getStep_img());
+                                             stepFragment.setArguments(bundle);
+                                             fragments.add(stepFragment);
+                                         }
+                                         clearData();
+                                         stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(),MainActivity.this, fragments);
+                                         vp.setAdapter(stepPageAdapter);
+                                         vp.setCurrentItem(0);
+                                         indicator.setViewPager(vp);
+
+                                     }
+                                 }
+                             },1000);
+
+
+                                for (int i = 0; i < list.size(); i++) {
+                                    updata(list.get(i).getProduct_id());
+                                }
+
+
 
                             //设置音乐
-                            JZDataSource dataSource = new JZDataSource(map, "");
-                            video.setUp(dataSource, JzvdStd.SCREEN_WINDOW_NORMAL);
-                            video.startVideo();
-                            video.setCount(Integer.valueOf(mCurrGoods.getCycleindex() == null ? "0" : mCurrGoods.getCycleindex()));
-                            video.startVideo();
-                            adapter.notifyDataSetChanged();
 
-
-                            if (mCurrGoods != null) {
-                                List<Fragment> fragments = new ArrayList<>();
-                                for (int i = 0; i < mCurrGoods.getSteps().size(); i++) {
-
-                                    StepFragment stepFragment = new StepFragment();
-                                    Bundle bundle = new Bundle();
-                                    if (!downLoadStep(mCurrGoods.getSteps().get(i))) {
-                                        bundle.putString("audio", getLoctionPath(mCurrGoods.getSteps().get(i)));
-                                    } else {
-                                        bundle.putString("audio", mCurrGoods.getSteps().get(i).getStep_voice());
-                                    }
-                                    bundle.putString("bg", mCurrGoods.getSteps().get(i).getStep_img());
-                                    stepFragment.setArguments(bundle);
-                                    fragments.add(stepFragment);
-                                }
-                                stepPageAdapter = new StepPageAdapter(getSupportFragmentManager(), fragments);
-                                vp.setAdapter(stepPageAdapter);
-                                vp.setCurrentItem(0);
-                                indicator.setViewPager(vp);
-
-                            }
+                        }else {
+                            showProgressDialog("正在下载（"+sum+"/"+count+"）");
                         }
                     }
                 });
@@ -1692,6 +1820,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if(!NetworkUtils.isConnected()){
             return;
         }
+        if(isUpDate){
+            return;
+        }
         //每次点击时，数组向前移动一位
         System.arraycopy(mHits, 1, mHits, 0, mHits.length - 1);
         //为数组最后一位赋值
@@ -1699,6 +1830,72 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         if (mHits[0] >= (SystemClock.uptimeMillis() - DURATION)) {
             mHits = new long[COUNTS];//重新初始化数组
             loadXinTiao1();
+        }
+    }
+    /**
+     * 删除单个文件
+     * @param   filePath    被删除文件的文件名
+     * @return 文件删除成功返回true，否则返回false
+     */
+    public boolean deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (file.isFile() && file.exists()) {
+            return file.delete();
+        }
+        return false;
+    }
+
+    /**
+     * 删除文件夹以及目录下的文件
+     * @param   filePath 被删除目录的文件路径
+     * @return  目录删除成功返回true，否则返回false
+     */
+    public boolean deleteDirectory(String filePath) {
+        boolean flag = false;
+        //如果filePath不以文件分隔符结尾，自动添加文件分隔符
+        if (!filePath.endsWith(File.separator)) {
+            filePath = filePath + File.separator;
+        }
+        File dirFile = new File(filePath);
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        flag = true;
+        File[] files = dirFile.listFiles();
+        //遍历删除文件夹下的所有文件(包括子目录)
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile()) {
+                //删除子文件
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } else {
+                //删除子目录
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前空目录
+        return true;
+    }
+
+    /**
+     *  根据路径删除指定的目录或文件，无论存在与否
+     *@param filePath  要删除的目录或文件
+     *@return 删除成功返回 true，否则返回 false。
+     */
+    public boolean DeleteFolder(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return false;
+        } else {
+            if (file.isFile()) {
+                // 为文件时调用删除文件方法
+                return deleteFile(filePath);
+            } else {
+                // 为目录时调用删除目录方法
+                return deleteDirectory(filePath);
+            }
         }
     }
 }

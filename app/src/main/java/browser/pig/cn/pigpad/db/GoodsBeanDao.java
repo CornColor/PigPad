@@ -36,6 +36,7 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         public final static Property Fullscreen_Interval = new Property(9, String.class, "fullscreen_Interval", false, "FULLSCREEN__INTERVAL");
         public final static Property Cycleindex = new Property(10, String.class, "cycleindex", false, "CYCLEINDEX");
         public final static Property Product_updatecode = new Property(11, String.class, "product_updatecode", false, "PRODUCT_UPDATECODE");
+        public final static Property Product_state = new Property(12, String.class, "product_state", false, "PRODUCT_STATE");
     };
 
 
@@ -62,7 +63,8 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
                 "\"IFFULLSCREEN\" TEXT," + // 8: iffullscreen
                 "\"FULLSCREEN__INTERVAL\" TEXT," + // 9: fullscreen_Interval
                 "\"CYCLEINDEX\" TEXT," + // 10: cycleindex
-                "\"PRODUCT_UPDATECODE\" TEXT);"); // 11: product_updatecode
+                "\"PRODUCT_UPDATECODE\" TEXT," + // 11: product_updatecode
+                "\"PRODUCT_STATE\" TEXT);"); // 12: product_state
     }
 
     /** Drops the underlying database table. */
@@ -126,6 +128,11 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         if (product_updatecode != null) {
             stmt.bindString(12, product_updatecode);
         }
+ 
+        String product_state = entity.getProduct_state();
+        if (product_state != null) {
+            stmt.bindString(13, product_state);
+        }
     }
 
     @Override
@@ -183,6 +190,11 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         if (product_updatecode != null) {
             stmt.bindString(12, product_updatecode);
         }
+ 
+        String product_state = entity.getProduct_state();
+        if (product_state != null) {
+            stmt.bindString(13, product_state);
+        }
     }
 
     @Override
@@ -204,7 +216,8 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // iffullscreen
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // fullscreen_Interval
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // cycleindex
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // product_updatecode
+            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // product_updatecode
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12) // product_state
         );
         return entity;
     }
@@ -223,6 +236,7 @@ public class GoodsBeanDao extends AbstractDao<GoodsBean, Long> {
         entity.setFullscreen_Interval(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setCycleindex(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setProduct_updatecode(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
+        entity.setProduct_state(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
      }
     
     @Override

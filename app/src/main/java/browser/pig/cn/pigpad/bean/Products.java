@@ -66,9 +66,15 @@ public class Products extends BaseBean{
         private String iffullscreen;
         private String fullscreen_Interval;
         private String cycleindex;
+        private String product_state;
 
+        public String getProduct_state() {
+            return product_state;
+        }
 
-
+        public void setProduct_state(String product_state) {
+            this.product_state = product_state;
+        }
 
         private String product_updatecode;
 
@@ -89,6 +95,21 @@ public class Products extends BaseBean{
             this.product_updatecode = product_updatecode;
             this.steps = steps;
         }
+        public void upadata(String product_id, String product_name, String product_video, String remarks, String product_icon, boolean isSelect, boolean isHidLine, String iffullscreen, String fullscreen_Interval, String cycleindex, String product_updatecode, List<StepBean> steps) {
+            this.product_id = product_id;
+            this.product_name = product_name;
+            this.product_video = product_video;
+            this.remarks = remarks;
+            this.product_icon = product_icon;
+            this.isSelect = isSelect;
+            this.isHidLine = isHidLine;
+            this.iffullscreen = iffullscreen;
+            this.fullscreen_Interval = fullscreen_Interval;
+            this.cycleindex = cycleindex;
+            this.product_updatecode = product_updatecode;
+            this.steps = steps;
+        }
+
 
         public List<StepBean> getSteps() {
             return steps;
@@ -196,6 +217,7 @@ public class Products extends BaseBean{
         private String product_name;
         private String product_video;
         private String remarks;
+
 
 
         public StepBean(String step_id, String product_id, String step_num, String step_text, String step_img, String step_voice, String product_name, String product_video, String remarks) {

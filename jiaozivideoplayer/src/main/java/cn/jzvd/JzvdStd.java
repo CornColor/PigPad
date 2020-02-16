@@ -672,28 +672,28 @@ public class JzvdStd extends Jzvd {
 
     @Override
     public void showProgressDialog(float deltaX, String seekTime, long seekTimePosition, String totalTime, long totalTimeDuration) {
-        super.showProgressDialog(deltaX, seekTime, seekTimePosition, totalTime, totalTimeDuration);
-        if (mProgressDialog == null) {
-            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jz_dialog_progress, null);
-            mDialogProgressBar = localView.findViewById(R.id.duration_progressbar);
-            mDialogSeekTime = localView.findViewById(R.id.tv_current);
-            mDialogTotalTime = localView.findViewById(R.id.tv_duration);
-            mDialogIcon = localView.findViewById(R.id.duration_image_tip);
-            mProgressDialog = createDialogWithView(localView);
-        }
-        if (!mProgressDialog.isShowing()) {
-            mProgressDialog.show();
-        }
-
-        mDialogSeekTime.setText(seekTime);
-        mDialogTotalTime.setText(" / " + totalTime);
-        mDialogProgressBar.setProgress(totalTimeDuration <= 0 ? 0 : (int) (seekTimePosition * 100 / totalTimeDuration));
-        if (deltaX > 0) {
-            mDialogIcon.setBackgroundResource(R.drawable.jz_forward_icon);
-        } else {
-            mDialogIcon.setBackgroundResource(R.drawable.jz_backward_icon);
-        }
-        onCLickUiToggleToClear();
+   //     super.showProgressDialog(deltaX, seekTime, seekTimePosition, totalTime, totalTimeDuration);
+//        if (mProgressDialog == null) {
+//            View localView = LayoutInflater.from(getContext()).inflate(R.layout.jz_dialog_progress, null);
+//            mDialogProgressBar = localView.findViewById(R.id.duration_progressbar);
+//            mDialogSeekTime = localView.findViewById(R.id.tv_current);
+//            mDialogTotalTime = localView.findViewById(R.id.tv_duration);
+//            mDialogIcon = localView.findViewById(R.id.duration_image_tip);
+//            mProgressDialog = createDialogWithView(localView);
+//        }
+//        if (!mProgressDialog.isShowing()) {
+//            mProgressDialog.show();
+//        }
+//
+//        mDialogSeekTime.setText(seekTime);
+//        mDialogTotalTime.setText(" / " + totalTime);
+//        mDialogProgressBar.setProgress(totalTimeDuration <= 0 ? 0 : (int) (seekTimePosition * 100 / totalTimeDuration));
+//        if (deltaX > 0) {
+//            mDialogIcon.setBackgroundResource(R.drawable.jz_forward_icon);
+//        } else {
+//            mDialogIcon.setBackgroundResource(R.drawable.jz_backward_icon);
+//        }
+//        onCLickUiToggleToClear();
     }
 
     @Override

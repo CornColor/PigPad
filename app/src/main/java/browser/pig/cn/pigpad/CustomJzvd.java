@@ -7,6 +7,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.List;
+
+import browser.pig.cn.pigpad.bean.Products;
 import cn.jzvd.JZDataSource;
 import cn.jzvd.JZMediaManager;
 import cn.jzvd.Jzvd;
@@ -17,8 +20,10 @@ import cn.jzvd.JzvdStd;
  */
 public class CustomJzvd extends JzvdStd {
     Context mContext;
-    //循环次数
-    private int count = -1;
+    private List<Products.GoodsBean> list;
+
+
+
     public CustomJzvd(Context context) {
         super(context);
         mContext = context;
@@ -35,6 +40,9 @@ public class CustomJzvd extends JzvdStd {
         //传入自定义布局
         return R.layout.my_play;
     }
+
+
+
 
     @Override
     public void onStateError() {
@@ -60,9 +68,7 @@ public class CustomJzvd extends JzvdStd {
         Jzvd.NORMAL_ORIENTATION = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
     }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
+
 
     @Override
     public void onStateAutoComplete() {
@@ -79,26 +85,66 @@ public class CustomJzvd extends JzvdStd {
     public void onAutoCompletion() {
         super.onAutoCompletion();
         //播放下一集 在这里切换url
-                if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
-                    if(count <= 0){
-                        if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()-1){
-                            int index = jzDataSource.currentUrlIndex+1;
-                            changeUrl(index,0);
-                        }else {
-                            changeUrl(0,0);
-                        }
+//                if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+//                    if(count <= 0){
+//                        if(jzDataSource.currentUrlIndex<jzDataSource.urlsMap.size()-1){
+//                            int index = jzDataSource.currentUrlIndex+1;
+//                            changeUrl(index,0);
+//                        }else {
+//                            changeUrl(0,0);
+//                        }
+//                    }else {
+//                        count--;
+//                        int index = jzDataSource.currentUrlIndex;
+//                        changeUrl(index,0);
+//                    }
+//
+//
+//                }else {
+//                        int index = jzDataSource.currentUrlIndex;
+//                        changeUrl(index,0);
+//                }
+        list =  ((MainActivity)mContext).getGoods();
+       int count = ((MainActivity)mContext).getXunhuan();
+        ((MainActivity)mContext).setXunhuan(count-1);
+        count = ((MainActivity)mContext).getXunhuan();
+        if (currentScreen == SCREEN_WINDOW_FULLSCREEN) {
+            if(list!= null){
+                int index = jzDataSource.currentUrlIndex;
+                   if(count <= 0){
+
+                           index = jzDataSource.currentUrlIndex;
+                           if(index == list.size()-1){
+                               index = -1;
+                           }
+
+                       for (int i = index+1;i<list.size();i++){
+                           Products.GoodsBean goodsBean = list.get(i);
+                           if(!"0".equals(goodsBean.getIffullscreen())){
+                               try{
+                                   ((MainActivity)mContext).setXunhuan(Integer.valueOf(goodsBean.getCycleindex()));
+                               }catch (Exception e){
+                                   ((MainActivity)mContext).setXunhuan(1);
+                               }
+                               changeUrl(i,0);
+
+                               break;
+
+                           }
+                           if(i == list.size()-1){
+                               i =-1;
+                           }
+                       }
                     }else {
-                        count--;
-                        int index = jzDataSource.currentUrlIndex;
-                        changeUrl(index,0);
+                       changeUrl(index,0);
                     }
 
+            }
 
-                }else {
-                        int index = jzDataSource.currentUrlIndex;
+        }else {
+                       int index = jzDataSource.currentUrlIndex;
                         changeUrl(index,0);
-                }
-
+        }
 
     }
 
@@ -122,10 +168,6 @@ public class CustomJzvd extends JzvdStd {
 
                     }
                     //quit fullscreen
-
-
-
-
                 }
                 break;
         }
