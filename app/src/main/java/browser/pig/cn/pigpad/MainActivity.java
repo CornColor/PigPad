@@ -1,5 +1,6 @@
 package browser.pig.cn.pigpad;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -179,9 +180,9 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 @Override
                 public void run() {
                     if(video.currentScreen != SCREEN_WINDOW_FULLSCREEN){
-                        if(isUpDate){
-                            return;
-                        }
+//                        if(isUpDate){
+//                            return;
+//                        }
                         if(video.jzDataSource == null){
                             return;
                         }
@@ -309,8 +310,14 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
     }
 
     private void stopTimer() {
-        if (timer != null) {
+        if (task != null){
+            task.cancel();
+            task = null;
+        }
+        if (timer != null){
             timer.cancel();
+            timer.purge();
+            timer = null;
         }
 
     }
@@ -672,6 +679,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 }).start();
 
     }
+
 
 
 
@@ -1660,10 +1668,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         if(sum == count){
                             startTimer();
-                            cancelProgressDialog();
                             isDownload = false;
                             showToast("下载完成");
                             cancelProgressDialog();
@@ -1760,7 +1766,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 if (task.getListener() != downloadListener) {
                     return;
                 }
-
+                cancelProgressDialog();
+                Log.e("完成",sum+" "+count);
             }
 
             @Override
@@ -1776,7 +1783,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                 if(task.getListener() != downloadListener){
                     return;
                 }
-                Log.d("feifei","error taskId:"+task.getId()+",e:"+e.getLocalizedMessage());
+                showToast("下载文件失败");
+                FileDownloader.getImpl().clearAllTaskData();
+                reStartApp();
+
             }
 
             @Override
@@ -1789,6 +1799,12 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         };
     }
 
+    public  void reStartApp() {
+        Intent intent = new Intent(this,WelcomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
 
 
     final static int COUNTS = 5;// 点击次数
