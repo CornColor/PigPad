@@ -1669,7 +1669,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     @Override
                     public void run() {
                         if(sum == count){
-                            startTimer();
+
                             isDownload = false;
                             showToast("下载完成");
                             cancelProgressDialog();
@@ -1727,6 +1727,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                          vp.setCurrentItem(0);
                                          indicator.setViewPager(vp);
 
+                                         startTimer();
                                      }
                                  }
                              },1000);
