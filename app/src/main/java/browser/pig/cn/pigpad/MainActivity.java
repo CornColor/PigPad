@@ -73,6 +73,8 @@ import cn.my.library.utils.util.NetworkUtils;
 import cn.my.library.utils.util.StringUtils;
 import me.relex.circleindicator.CircleIndicator;
 
+import static android.Manifest.permission.REQUEST_INSTALL_PACKAGES;
+import static android.Manifest.permission.WRITE_SETTINGS;
 import static browser.pig.cn.pigpad.net.ApiSearvice.CREATE_D;
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_LIST;
 import static browser.pig.cn.pigpad.net.ApiSearvice.GOODS_STEP;
@@ -222,10 +224,10 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                                 public void run() {
 
 
-                                    if (video.currentState == CURRENT_STATE_PLAYING) {
+                                  //  if (video.currentState == CURRENT_STATE_PLAYING) {
                                         video.startWindowFullscreen();
                                         video.onEvent(JZUserAction.ON_ENTER_FULLSCREEN);
-                                    }
+                                 //   }
 
 
                                 }
@@ -276,6 +278,8 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        requestPermission(Permission.Group.STORAGE,Permission.Group.CAMERA);
+        requestPermission(new String[]{WRITE_SETTINGS,REQUEST_INSTALL_PACKAGES});
 
     }
 
@@ -294,13 +298,14 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
          */
         initTimer();
         try {
-            timer.schedule(task, fenzhong*60 * 1000);
+            timer.schedule(task, 30 * 1000);
         } catch (IllegalStateException e) {
             e.printStackTrace();
             initTimer();
-            timer.schedule(task, fenzhong*60 * 1000);
+            timer.schedule(task, 30 * 1000);
         }
     }
+
 
     @Override
     protected void onStop() {
@@ -403,11 +408,11 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (video.currentState == CURRENT_STATE_PLAYING) {
+                       //     if (video.currentState == CURRENT_STATE_PLAYING) {
                                 video.onEvent(JZUserAction.ON_CLICK_PAUSE);
                                 JZMediaManager.pause();
                                 video.onStatePause();
-                            }
+                       //     }
 
                         }
                     },1000);
@@ -490,6 +495,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         super.onResume();
         try{
             Jzvd.goOnPlayOnResume();
+            startTimer();
         }catch (Exception e){
 
         }
