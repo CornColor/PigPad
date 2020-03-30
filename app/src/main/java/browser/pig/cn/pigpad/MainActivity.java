@@ -1630,7 +1630,7 @@ public class MainActivity extends BaseActivity implements GoodsAdapter.OnGoodsCl
         // 每个任务的进度 无回调
         // do not want each task's download progress's callback,we just consider which task will completed.
         //失败 重试次数
-        queueSet.setAutoRetryTimes(3);
+        queueSet.setAutoRetryTimes(30);
 
 
         //(4)并行执行
